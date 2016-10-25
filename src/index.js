@@ -3,7 +3,7 @@
 var Http = require('./http.js');
 var config = {
     root: '/',
-    debug: true,
+    debug: false,
     status: 'status',
     data: 'info',
     code: {//默认状态
@@ -27,7 +27,10 @@ var config = {
             }
             if (this.readyState === XMLHttpRequest.DONE) {
                 if (this.status >= 200 && this.status < 300) {
-                    YYF.getHandle()(this.responseText, this);
+                    var handler = YYF.getHandle();
+                    console.assert(typeof handler === "function");
+                    // console.debug(handle);
+                    handler(this.responseText, this);
                 } else {
                     reject(this);
                 }
@@ -85,15 +88,17 @@ function resolve(responseText) {
 
         status = config.codeMap[status];
         var handle = YYF.getHandle(status);
-        console.log(status, handle, response);
+        if (config.debug) {
+            console.debug(status, handle, response);
+        }
         if (handle) {
-            var info = response[config.info];
+            var info = response[config.data];
             handle(info);
         } else {
 
         }
     } catch (e) {
-        console.log(e);
+        console.error(e);
     }
 };
 

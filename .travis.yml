@@ -1,0 +1,35 @@
+language: node_js
+sudo: false
+
+git:
+  depth: 2
+
+
+install: 
+  - npm install
+
+
+# build and test
+script:
+  - npm run b
+  - npm run p
+  - npm run test
+
+
+# 自动发布
+deploy:
+  - provider: npm
+    email: travis@newfututre.cc
+    api_key: "${NPM_TOKEN}"
+    skip_cleanup: true
+    on:
+      tags: true
+      branch: master
+
+  - provider: releases
+    api_key: "${GH_TOKEN}"
+    file: "lib/yyf.js"
+    skip_cleanup: true
+    on:
+      tags: true
+      branch: master
