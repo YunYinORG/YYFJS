@@ -6,22 +6,22 @@ var config = {
     debug: false,
     status: 'status',
     data: 'info',
-    code: {//默认状态
-        success: 1,//response success
+    code: { //默认状态
+        success: 1, //response success
         fail: 0, // response false
         auth: -1, // need auth
     },
-    handle: {//默认回调
+    handle: { //默认回调
         /*操作成功*/
-        success: function () { },
+        success: function() {},
         /*操作失败*/
-        fail: function () { },
+        fail: function() {},
         /*验证回调*/
-        auth: function () { },
-        _error: function () { },//出错回调
+        auth: function() {},
+        _error: function() {}, //出错回调
     },
     callback: {
-        onload: function () {
+        onload: function() {
             if (config.debug) {
                 console.log(this.status, this.responseText);
             }
@@ -36,7 +36,7 @@ var config = {
                 }
             }
         },
-        onerror: function () {
+        onerror: function() {
             reject(this);
         }
     }
@@ -109,7 +109,7 @@ function reject(xhr) {
 /**
  * set status code
  */
-YYF.setCode = function (status, code) {
+YYF.setCode = function(status, code) {
     config.code[status] = code;
     buildCodeMap();
     return this;
@@ -118,7 +118,7 @@ YYF.setCode = function (status, code) {
 /**
  * set default status handle
  */
-YYF.setHandle = function (key, callback) {
+YYF.setHandle = function(key, callback) {
     if (typeof callback !== "undefined") {
         config.handle[key] = callback;
     } else if (typeof key === "function") {
@@ -132,8 +132,8 @@ YYF.setHandle = function (key, callback) {
 /**
  * set status handle for once
  */
-['success', 'error'].forEach(function (status) {
-    YYF[status] = function (callback) {
+['success', 'fail'].forEach(function(status) {
+    YYF[status] = function(callback) {
         handle[status] = callback;
         return this;
     }
@@ -142,7 +142,7 @@ YYF.setHandle = function (key, callback) {
 /**
  * get status handle
  */
-YYF.getHandle = function (status) {
+YYF.getHandle = function(status) {
     if (status) {
         return handle[status] ? handle[status] : config.handle[status];
     } else {
@@ -162,12 +162,12 @@ function request(url, method, data, success, error) {
     return req;
 };
 
-YYF.delete = function (url, success, fail) {
+YYF.delete = function(url, success, fail) {
     return request(url, 'DELETE', null, success, fail);
 };
 
-['get', 'put', 'post', 'patch'].forEach(function (m) {
-    YYF[m] = function (url, data, success, fail) {
+['get', 'put', 'post', 'patch'].forEach(function(m) {
+    YYF[m] = function(url, data, success, fail) {
         return request(url, m.toUpperCase(), data, success, fail);
     };
 });

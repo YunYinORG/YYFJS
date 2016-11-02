@@ -1,33 +1,33 @@
 {
-  "name": "yyfjs",
-  "version": "0.1.0",
-  "description": "YYF前端请求和数据接口JS库, the frontend JavaScript lib for YYF RESTful API request",
-  "main": "lib/yyf.js",
-  "scripts": {
-    "test": "node lib/yyf.js",
-    "p": "webpack -p src/index.js lib/yyf.js",
-    "b": "webpack src/index.js lib/yyf.dev.js",
-    "w": "webpack --progress --colors --watch src/index.js lib/yyf.dev.js"        
-  },
-  "devDependencies": {
-    "webpack": "^1.13.2"
-  },
-  "files": [
-    "lib/yyf.js"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/YunYinORG/YYFJS.git"
-  },
-  "keywords": [
-    "YYF",
-    "RESTFUL",
-    "API"
-  ],
-  "author": "New Future",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/YunYinORG/YYFJS/issues"
-  },
-  "homepage": "https://github.com/YunYinORG/YYFJS#readme"
+    "name": "yyfjs",
+    "version": "0.1.1",
+    "description": "YYF前端请求和数据接口JS库, the frontend JavaScript lib for YYF RESTful API request",
+    "main": "lib/yyf.js",
+    "scripts": {
+        "test": "node lib/yyf.js",
+        "p": "webpack -p src/index.js lib/yyf.js",
+        "b": "webpack src/index.js lib/yyf.dev.js",
+        "w": "webpack --progress --colors --watch src/index.js lib/yyf.dev.js"
+    },
+    "devDependencies": {
+        "webpack": "*"
+    },
+    "files": [
+        "lib/yyf.js"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/YunYinORG/YYFJS.git"
+    },
+    "keywords": [
+        "YYF",
+        "RESTFUL",
+        "API"
+    ],
+    "author": "New Future",
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/YunYinORG/YYFJS/issues"
+    },
+    "homepage": "https://github.com/YunYinORG/YYFJS#readme"
 }
