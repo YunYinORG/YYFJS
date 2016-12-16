@@ -2,7 +2,7 @@
     "name": "yyfjs",
     "version": "0.2.0",
     "description": "YYF前端请求和数据接口JS库, the frontend JavaScript lib for YYF RESTful API request",
-    "main": "src/index.js",
+    "main": "src/yyf.js",
     "scripts": {
         "test": "node lib/yyf.js",
         "p": "webpack -p src/index.js lib/yyf.js",
