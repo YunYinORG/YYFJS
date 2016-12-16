@@ -1,19 +1,17 @@
 {
     "name": "yyfjs",
-    "version": "0.2.0",
+    "version": "1.0.0",
     "description": "YYF前端请求和数据接口JS库, the frontend JavaScript lib for YYF RESTful API request",
     "main": "src/yyf.js",
     "scripts": {
         "test": "node lib/yyf.js",
-        "p": "webpack -p src/index.js lib/yyf.js",
-        "b": "webpack src/index.js lib/yyf.dev.js",
-        "w": "webpack --progress --colors --watch src/index.js lib/yyf.dev.js"
+        "b": "uglifyjs -o lib/yyf.js src/yyf.js "
     },
     "devDependencies": {
         "webpack": "*"
     },
     "files": [
-        "src/"
+        "src/yyf.js"
     ],
     "repository": {
         "type": "git",
