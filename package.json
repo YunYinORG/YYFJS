@@ -1,6 +1,6 @@
 {
     "name": "yyfjs",
-    "version": "1.0.0",
+    "version": "1.1.2",
     "description": "YYF前端请求和数据接口JS库, the frontend JavaScript lib for YYF RESTful API request",
     "main": "src/yyf.js",
     "scripts": {

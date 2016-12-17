@@ -82,9 +82,17 @@
             if (CONFIG.root && CONFIG.root !== url[0]) {
                 url = CONFIG.root + url;
             }
-            if (this.METHOD === 'GET') {
-                url += serialize(data);
-            } else if (data) {
+            if (this.METHOD === 'GET' && data) {
+                url += '?' + serialize(data);
+                data = null;
+            }
+            // initialize request with URL and send
+            if (CONFIG.debug) {
+                console.log(url);
+            }
+            req.open(this.METHOD, url, this.ASYNC);
+
+            if (data) {
                 switch (this.TYPE.toLowerCase()) {
                     case 'urlencoded':
                     case 'url': //submit as urlencoded form
@@ -123,11 +131,6 @@
                     req.setRequestHeader(key, this.HEADERS[key]);
                 }
             }
-            // initialize request with URL and send
-            if (CONFIG.debug) {
-                console.log(url);
-            }
-            req.open(this.METHOD, url, this.ASYNC);
             req.send(data);
             return this;
         }
@@ -261,12 +264,27 @@
         }
     };
 
-    if (typeof module !== 'undefined' && typeof exports === 'object') {
-        module.exports = YYF;
-    } else if (typeof define === 'function' && define.amd) {
-        define(function() { return YYF; });
+    /**
+     * Vue plugin
+     */
+    function install(Vue, options) {
+        if (options) {
+            config(options);
+        }
+        Vue.YYF = Vue.prototype.$yyf = YYF;
+    }
+    if (typeof window !== 'undefined' && window.Vue) {
+        //Vue auto install
+        window.Vue.use(install);
     } else {
-        this.YYF = YYF;
+        YYF.install = install;
+        if (typeof module !== 'undefined' && typeof exports === 'object') {
+            module.exports = YYF;
+        } else if (typeof define === 'function' && define.amd) {
+            define(function() { return YYF; });
+        } else {
+            this.YYF = YYF;
+        }
     }
 }).call(function() {
     return this || (typeof window !== 'undefined' ? window : global);
