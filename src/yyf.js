@@ -178,7 +178,7 @@
             } else if (typeof key === "function") {
                 this.handle = key;
             } else if (CONFIG.debug) {
-                console.log("it's not callable function", key, callback);
+                console.log("it's not callable", key, callback);
             }
             return this;
         },
@@ -190,8 +190,8 @@
             }
         },
         request: function(url, method, data, async) { //request resource
-            var http = new Http(method, async);
-            http.callback('onload', this.onload)
+            (new Http(method, async))
+            .callback('onload', this.onload)
                 .callback('onerror', this.onerror)
                 .request(url, data);
             return this;
@@ -211,7 +211,9 @@
         }
     });
 
-
+    /**
+     * config
+     */
     function config(options, handle, code) {
         if (arguments.length === 1 && (
                 typeof options['options'] === "object" ||

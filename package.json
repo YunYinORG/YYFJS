@@ -5,10 +5,10 @@
     "main": "src/yyf.js",
     "scripts": {
         "test": "node lib/yyf.js",
-        "b": "uglifyjs -o lib/yyf.js src/yyf.js "
+        "p": "uglifyjs -m -o lib/yyf.js src/yyf.js"
     },
     "devDependencies": {
-        "webpack": "*"
+        "uglify-js": "*"
     },
     "files": [
         "src/yyf.js"
