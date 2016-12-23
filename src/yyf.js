@@ -23,21 +23,21 @@
             '0': 'fail',
             '-1': 'auth',
         },
-        setCode: function(code, status) { //set code 
-            if (code) {
-                CONFIG._code[status] = code;
-                CONFIG._codeMap[code] = status;
-            } else {
-                delete CONFIG._code[status];
-                delete CONFIG._codeMap[code];
+        setCode: function(code_num, status_string) { //set code 
+            if (status_tring) { //set
+                CONFIG._code[status_tring] = code_num;
+                CONFIG._codeMap[code_num] = status_tring;
+            } else { //delete
+                delete CONFIG._code[CONFIG._codeMap[code_num]];
+                delete CONFIG._codeMap[code_num];
             }
         },
 
         handle: { //default handlers
             auth: function() {},
+            onerror: console.error, //default handle for network error            
             success: function() {},
-            fail: function() {},
-            onerror: console.error //default handle for network error
+            fail: function() {}
         },
     };
     /**
@@ -150,20 +150,17 @@
                 }
             }
         };
-        this._handle = function(responseText, res) { //default resolve response
+        this._handle = function(response, res) { //default resolve response
             if (DEBUG) {
                 console.debug(response);
             }
             var handler = this.getHandle('complete');
             try {
-                var response = JSON.parse(responseText);
-            } catch (e) { // not jso
-                if (handler) {
-                    handler(responseText);
-                }
-                return;
+                var response = JSON.parse(response);
+            } catch (e) { // not json
             }
-            if (!handler) {
+            if ((!handler) || (handler(response, res) && typeof response == "object")) {
+                //no handler，or handler return true
                 if (CONFIG.status in response) { // get status
                     var status = CONFIG._codeMap[response[CONFIG.status]];
                     handler = this.getHandle(status);
@@ -171,8 +168,6 @@
                 } else { //no 'status' key in response
                     handler = this.getHandle('onerror');
                 }
-            }
-            if (handler) {
                 handler(response, res);
             }
         };
@@ -244,7 +239,7 @@
             CONFIG.handle[key] = handle[key];
         }
         for (key in code) {
-            CONFIG.setCode(key, code[key]);
+            CONFIG.setCode(code[key], key);
         }
         return (new yyf());
     };
