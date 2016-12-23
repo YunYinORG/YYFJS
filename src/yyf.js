@@ -138,7 +138,7 @@
      */
     function yyf() {
         var that = this;
-        this._onload = function() { // status change
+        that._onload = function() { // status change
             if (DEBUG) {
                 console.log(this.status, this.responseText);
             }
@@ -150,11 +150,11 @@
                 }
             }
         };
-        this._handle = function(response, res) { //default resolve response
+        that._handle = function(response, res) { //default resolve response
             if (DEBUG) {
                 console.debug(response);
             }
-            var handler = this.getHandle('complete');
+            var handler = that.getHandle('complete');
             try {
                 var response = JSON.parse(response);
             } catch (e) { // not json
@@ -163,15 +163,15 @@
                 //no handler，or handler return true
                 if (CONFIG.status in response) { // get status
                     var status = CONFIG._codeMap[response[CONFIG.status]];
-                    handler = this.getHandle(status);
+                    handler = that.getHandle(status);
                     response = response[CONFIG.data]
                 } else { //no 'status' key in response
-                    handler = this.getHandle('onerror');
+                    handler = that.getHandle('onerror');
                 }
                 handler(response, res);
             }
         };
-        return this;
+        return that;
     };
     yyf.prototype = {
         setHandle: function(key, callback) { //set handle for different status
