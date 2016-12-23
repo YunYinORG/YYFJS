@@ -1,8 +1,10 @@
 {
     "name": "yyfjs",
-    "version": "1.1.21",
+    "version": "1.1.22-beta",
+    "title": "YYFjs",
     "description": "YYF前端请求和数据接口JS库, the frontend JavaScript lib for YYF RESTful API request",
     "main": "lib/yyf.js",
+    "browser": "lib/yyf.min.js",
     "scripts": {
         "test": "node lib/yyf.js",
         "p": "uglifyjs -m -r yyf --mangle-props --mangle-regex='/^_/' -c conditionals=true -c sequences=true -c join_vars=true -c comparisons=true -c evaluate=true -c booleans=false -c drop_debugger=true -c drop_console=true -o lib/yyf.js -d DEBUG=false src/yyf.js"
