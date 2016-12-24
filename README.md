@@ -70,7 +70,7 @@ YYF.post('Resource/id', data)
 
 | 参数   |  类型            |      默认    | 参数说明 |
 | :-----|:---------------- | :----------:| :----- |
-|`uri`  | `string`         | 无(必须)     | 请求资源，自动加上前缀[全局配置](#32-options-基本默认配置)的`root`|
+|`uri`  | `string`         | 无(必须)     | 请求资源，自动补上[全局配置options](#32-options)的`root`|
 |`data` |`Object`或`string`| `undefined` | 发送数据,**delete**无此参数|
 |`async`| `bool`           | 读取全局配置  | 是否异步请求|
 
@@ -88,7 +88,7 @@ YYF.post('Resource/id', data)
     * `ready`设置拦截返回内容的回调方法(在success和fail等invoke之前)
     * `final`处理完成方法(在success和fail等invoke之后)
 
-参数细节参照[回调函数表](#33-handle-默认回调函数)
+参数细节参照[全局回调函数表handle](#33-handle)
 
 ## 3. Configure(配置)
 
@@ -110,7 +110,7 @@ var options = { //options 参数
     type: 'json'
 };
 //回调函数
-var handler = { //默认回调
+var handlers = { //默认回调
     auth: function(data) { //验证失败回调,默认对应status为-1代表验证失败
         alert("验证失败,请登录!" + data);
     },
@@ -119,20 +119,20 @@ var handler = { //默认回调
     }
 };
 //options和handler,后面参数可省略
-YYF(options, handler);
+YYF(options, handlers);
 ```
 * 单参数全部设置`YYF({})`
 ```js
 //all in one,
 YYF({
     options: options,
-    handle: handler
+    handle: handlers
 });
 ```
 
-### 3.2 options (基本默认配置)
+### 3.2 options 
 
-每次请求可能都有统样的设置，可以提前统一配置。
+**全局默认配置**，每次请求可能都有同样的设置，可以提前统一配置。
 
 | 键(key) | 类型(type)|     说明         | 默认(value)| 备注 |
 | :------ |:--------:| :---------------:| :----------:|------|
@@ -145,27 +145,37 @@ YYF({
 | `type`  | `string` | 发送请求编码格式   |`"urlencoded"`| <li>默认对跨域优化</li><li>`json`以json格式提交;</li><li>`form`以表单提交;</li><li>其他为自定义`Content-type`</li> |
 
 
-### 3.3 handle (默认回调函数)
+### 3.3 handle
+
+**全局默认回调函数**
 
 每次请求可以单独设置这些回调操作，**如果没有设置对应处理方式**,会使用下面的默认回调方式。
 
-通常,认证失败和网络错误预设一个统一的回调方式来提示用户
+例如，通常,认证失败和网络错误预设一个统一的回调方式来提示用户
 
-| 键(key) |     说明        | 回调参数|  默认值(value) | 触发条件 |
-| :------ |:---------------| :-----:|:-------------:|------|
+| 键(key) |     说明        | 回调参数表 |  默认值(value) | 触发条件和说明 |
+| :------ |:---------------| :-------:|:-------------:|------|
 |`onerror`| 请求失败或解析出错| 请求对象|`console.error`| 网络，服务器错误或解析出错 |
-|`ready`| 回调拦截,返回true执行后续|`response`,`res`|`undefined`| 当返回为true的值才执行invoke操作 |
-|`final`| 所有处理结束后,最后执行|`response`,`res`|`undefined`| 程序正常执行最后触发此操作 |
-| `auth`  | 认证失败默认回调  | `data`,`res` | `function(){}`| 返回`status`状态为`-1`(可设置) |
+| `before`| 请求预处理   |`data`,`headers`,<br/>`url`,`method`,`XHR`|`undefined`|发送请求前调用,可拦截request和修改发送数据|
+| `ready` | 回调拦截,返回true执行后续|`response`,`res`|`undefined`| 收到返回数据首先执行此操作|
+| `final` | 所有处理结束后,最后执行|`response`,`res`|`undefined`| 返回正常处理最后触发此操作 |
+| `auth`  | 认证失败默认回调  | `data`,`res` | `undefined`| 返回`status`状态为`-1`(可设置) |
 |`success`| 操作成功默认回调  | `data`,`res` | `function(){}`| 返回`status`状态为`1`(可设置) |
 | `fail`  | 操作失败默认回调  | `data`,`res` | `function(){}`| 返回`status`状态为`0`(可设置) |
-|其他string| 自定义调用(invoke) | `data`,`res` | 需要用户定义函数| 需要自定义返回状态码，见code配置 |
+|其他string| 自定义调用(invoke) | `data`,`res` | 需要用户定义函数| 需自定义状态码，见[code配置](#34-code) |
 
+说明:
+
+* `before` **仅可全局配置**,不能为某个请求单独设置(此接口通常用来在所有请求中添加统一的校验和,或者验证hash)
+* `before` 可以通过返回值修改数据,如果不存在返回值(不是`undefined`)则直接复制给请求的数据data
 * 当返回的response为可解析的json时, `ready`和`final`的第一个参数，传入值为解析后的对象；
 * 当返回的response为不是json时，`ready`和`final`的第一个参数，传入值为字符串；且不会进入invoke；
 * invoke 传入的第一个参数,传入值为解析后的数据字段(data)部分.
+* 如果设置了`ready`,且函数执行返回`false`(完全`===`**false**),可跳过 invoke直接进入`final` [详细流程](#5-flowchart-)
 
-### 3.4 code (状态码表)
+### 3.4 code
+
+**状态码表**
 
 解析请求结果时，会根据status字段(可以设置`options`中`status`字段来修改)不同的值代表不同状态,可以根据需要自定义或者覆盖这些状态码的默认设置
 
@@ -208,7 +218,7 @@ Vue.use(YYF,{/*配置*/});
 模块内部 使用 `this.$yyf`即可，相当于调用YYF
 
 exemple
-```
+```js
 var app = new Vue({
   el: '#app',
   mounted(){
@@ -217,58 +227,59 @@ var app = new Vue({
 })
 ```
 
-## 5. Flowchart (流程图)
+## 5. Flowchart
 
-基本流程: `response` => `ready()` =?=> `[INVOKE]()` ==> `final()`
+基本流程: `before()`==> [send request] => `ready()` ==> `[INVOKE?]()` ==> `final()`
 
 收到响应(response)后的处理流程：
 
-1. ready: 如果存在`ready`则先执行ready,返回值为false时直接进入第3步(final)，否则进入第2部(invoke)
-2. invoke: 根据status状态调用对应处理函数，如未定义调用默认配置,如果都未定义直接到第3步(final)
-3. final：如果存在`final`回调函数，则执行此函数，否则结束
+0. before: 发送http请求之前调用，如果有全局before,则调用before,如果有返回值，用来设置data数据
+1. 发送http请求，等待响应
+2. ready: 如果存在`ready`则先执行ready,返回值为false时直接进入第4步(final)，否则进入第3部(invoke)
+3. invoke: 根据status状态调用对应处理函数，如未定义调用默认配置,如果都未定义直接到第4步(final)
+4. final：如果存在`final`回调函数，则执行此函数，否则结束
+5. 结束
+
+流程图如下
 
 >
 ```
-       +-------+
-       | START |
-       +---+---+
-           |
-      +----v----+
-      | REQUEST |
-      +----+----+
-           |
-           v
-      +-----+----+
-      | RESPONSE |
-      +----+-----+
+      +-------+         +==========+
+      | START +-------> | before() |
+      +-------+         +==========+
+                             |
+                             v
+      +----------+------+----+----+
+      | RESPONSE  <-----  REQUEST |
+      +----------+------+---------+
            |
            v
     +-------------+
     |             |       +==========+
     | has "ready" |       |          |
-    |  handler ?  +-----> |  ready() |
+    |  handler ?  +------>|  ready() |
     |             | YES   |          |
     +------+------+       +==========+
-           |                   |
         NO |                   |
+           |                   |
            v                   |
     +============+         +---v----+
     |  [INVOKE]  |         |        |
     | -success() |         | return |
-    | -fail()    | <-------+ TRUE ? |
-    | -auth()    |    YES  |        |
+    | -fail()    | <-------+ FALSE? |
+    | -auth()    |      NO |        |
     |  ...       |         +---+----+
-    +============+             |
-           |                   | NO
+    +============+             | YES
+           |                   | 
            v                   |(skip)
     +------+------+            |
     |             | <----------+
     | has "final" |
     |  handler ?  |        +=========+
-    |             +------> |         |
-    +------+------+  YES   | final() |
-           |               |         |
-        NO |               +=========+
+    |             +------->|         |
+    +------+------+ YES    | final() |
+        NO |               |         |
+           |               +=========+
            v                   |
       +----+----+              |
       |  DONE   | <------------+

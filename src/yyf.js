@@ -5,7 +5,7 @@
      * default configure of http request
      */
     var CONFIG = {
-        root: '/', // request root url
+        root: '', // request root url
         async: true, // request async
         cookie: false, // using cookie when cors site (withCredentials)
         type: 'urlencoded', //request,Content-type,using x-www-form-urlencoded in default
@@ -33,8 +33,8 @@
             }
         },
 
-        handle: { //default handlers
-            onerror: console.error, //default handle for network error            
+        _handle: { //default handlers
+            onerror: console.error, //default handle for network error
             success: function() {},
             fail: function() {}
         },
@@ -53,23 +53,17 @@
     /**
      * Http request
      */
-    var Http = function(method, async, type) {
+    function Http(method, async, type) {
         this._METHOD = method || 'GET';
         this._ASYNC = typeof async === "undefined" ? CONFIG.async : async;
         this._TYPE = typeof type === "undefined" ? CONFIG.type : type;
     }
     Http.prototype = {
-        _fmt: function(data, req) { // format data and req
+        _format: function(data, req) { // format data and req
             switch (this._TYPE.toLowerCase()) {
                 case 'urlencoded':
                 case 'url': //send as urlencoded form
                     req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=utf-8');
-                    if (typeof data === "string" &&
-                        data[0] === "{" && data.slice(-1) === '}') {
-                        try {
-                            data = JSON.parse(data); //json string
-                        } catch (e) {}
-                    }
                     if (typeof data === "object") { //serialize onj
                         return serialize(data);
                     } else {
@@ -89,27 +83,37 @@
                             form.append(i, d[i]);
                         }
                         return form
-                    } else {
-                        return data;
                     }
-                default: //empty doesn't set Content-Type 
-                    if (this._TYPE) { //special Content type
-                        req.setRequestHeader('Content-Type', this._TYPE);
-                    }
-                    return data;
+                    break;
+                default: //special Content type
+                    req.setRequestHeader('Content-Type', this._TYPE);
             }
+            return data;
         },
         _send: function(url, data, callback) { //send request
-            var req = new XMLHttpRequest();
-            for (var key in callback) { // set callback
+            var that = this;
+            var request = new XMLHttpRequest();
+            var headers = Object.assign({}, CONFIG.headers);
+            var beforeHandler = CONFIG._handle['before'];
+            var key;
+
+            for (key in callback) { // set callback
                 if (callback[key]) {
-                    req[key] = callback[key];
+                    request[key] = callback[key];
                 }
             }
-            if (CONFIG.root !== url[0]) { // avoid root with double'/'
-                url = CONFIG.root + url;
+
+            url = CONFIG.root + url;
+
+            if (beforeHandler) { //before Hook
+                key = beforeHandler(data, headers, url, that._METHOD, request);
+                if (key !== undefined) { // using return as data
+                    data = key;
+                }
             }
-            if (this._METHOD === 'GET' && data) { //get serialize
+
+            //open
+            if (that._METHOD == 'GET' && data) { //get serialize
                 url += '?' + serialize(data);
                 data = null;
             }
@@ -117,18 +121,19 @@
             if (DEBUG) {
                 console.log(url);
             }
-            req.open(this._METHOD, url, this._ASYNC);
-            if (data) {
-                data = this._fmt(data, req);
+            request.open(that._METHOD, url, that._ASYNC);
+
+            if (data && that._TYPE) { //format data and set Content-Type
+                data = that._format(data, request);
             }
-            for (key in CONFIG.headers) { // set headers
-                if (CONFIG.headers.hasOwnProperty(key)) {
-                    req.setRequestHeader(key, CONFIG.headers[key]);
+            for (key in headers) { // set headers
+                if (headers.hasOwnProperty(key)) {
+                    request.setRequestHeader(key, headers[key]);
                 }
             }
-            req.withCredentials = CONFIG.cookie;
-            req.send(data);
-            return this;
+            request.withCredentials = CONFIG.cookie;
+            request.send(data);
+            return that;
         }
     };
 
@@ -156,25 +161,25 @@
             //ready
             var handler = that.getHandle('ready');
             try {
-                var response = JSON.parse(response);
+                response = JSON.parse(response);
             } catch (e) { // not json
             }
+
             // invoke
-            if ((!handler) || (handler(response, res) && typeof response == "object")) {
-                //no handler，or handler return true
+            if ((!(handler && (handler(response, res) === false))) && (typeof response == "object")) {
+                //no handler，or handler return false
                 if (CONFIG.status in response) { // get status
-                    var status = CONFIG._codeMap[response[CONFIG.status]];
-                    handler = that.getHandle(status);
-                    handler(response[CONFIG.data], res);
+                    that.getHandle(
+                        CONFIG._codeMap[response[CONFIG.status]]
+                    )(response[CONFIG.data], res);
                 } else { //no 'status' key in response
-                    handler = that.getHandle('onerror');
-                    handler(response, res);
+                    that.getHandle('onerror')(response, res);
                 }
             }
             //final
-            handle = that.getHandle('final');
-            if (handle) {
-                handle(response, res);
+            handler = that.getHandle('final');
+            if (handler) {
+                handler(response, res);
             }
         };
         return that;
@@ -192,7 +197,7 @@
         },
         getHandle: function(status) {
             if (status) {
-                return this._handle[status] || CONFIG.handle[status];
+                return this._handle[status] || CONFIG._handle[status];
             } else {
                 return this._handle;
             }
@@ -242,7 +247,7 @@
             CONFIG[key] = options[key];
         }
         for (key in handle) {
-            CONFIG.handle[key] = handle[key];
+            CONFIG._handle[key] = handle[key];
         }
         for (key in code) {
             CONFIG.setCode(code[key], key);
@@ -266,7 +271,7 @@
         return YYF;
     };
     YYF.getHandle = function(status) { //get default handle
-        return status ? CONFIG.handle[status] : CONFIG.handle;
+        return status ? CONFIG._handle[status] : CONFIG._handle;
     };
     // Vue plugin
     function install(Vue, options) {
@@ -276,7 +281,7 @@
         Vue.YYF = Vue.prototype.$yyf = YYF;
     }
     if (typeof window !== 'undefined' && window.Vue) { //Vue auto install
-        window.Vue.use(install);
+        install(window.Vue);
     } else {
         YYF.install = install;
         if (typeof module !== 'undefined' && typeof exports === 'object') { //require
