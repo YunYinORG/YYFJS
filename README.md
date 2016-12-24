@@ -46,7 +46,7 @@ YYF.success(function(data) {
 * 也可以把回调置后
 ```js
 YYF.post('Resource/id', data)
-.complete(function(response) {
+.ready(function(response) {
     //do somthing
     return true;
 }).success(function(data) {
@@ -79,11 +79,14 @@ YYF.post('Resource/id', data)
 
 所有回调接口 返回均为 `当前yyf`对象可以继续操作
 
-* `success`设置操作成功的回调方法
-* `fail`设置操作失败的回调方法
-* `auth`设置需要回调的回调方法
-* `complete`设置拦截返回内容的回调方法(在success和fail等之前)
-* 自定义回调 `setHandle(key,callback)`
+- invoke回调 (根据条件执行)
+    * `success`设置操作成功的回调方法
+    * `fail`设置操作失败的回调方法
+    * `auth`设置需要回调的回调方法
+    * 自定义回调 `setHandle(key,callback)`
+- 通用处理 (正常完成一定执行)
+    * `ready`设置拦截返回内容的回调方法(在success和fail等invoke之前)
+    * `final`处理完成方法(在success和fail等invoke之后)
 
 参数细节参照[回调函数表](#33-handle-默认回调函数)
 
@@ -151,12 +154,16 @@ YYF({
 | 键(key) |     说明        | 回调参数|  默认值(value) | 触发条件 |
 | :------ |:---------------| :-----:|:-------------:|------|
 |`onerror`| 请求失败或解析出错| 请求对象|`console.error`| 网络，服务器错误或解析出错 |
-|`complete`| 回调拦截,返回true执行后续|`response`,`res`|`undefined`| 当返回类true的值才执行下面的操作 |
+|`ready`| 回调拦截,返回true执行后续|`response`,`res`|`undefined`| 当返回为true的值才执行invoke操作 |
+|`final`| 所有处理结束后,最后执行|`response`,`res`|`undefined`| 程序正常执行最后触发此操作 |
 | `auth`  | 认证失败默认回调  | `data`,`res` | `function(){}`| 返回`status`状态为`-1`(可设置) |
 |`success`| 操作成功默认回调  | `data`,`res` | `function(){}`| 返回`status`状态为`1`(可设置) |
 | `fail`  | 操作失败默认回调  | `data`,`res` | `function(){}`| 返回`status`状态为`0`(可设置) |
-|其他string| 自定义回调       | `data`,`res` | 需要用户定义函数| 需要自定义返回状态码，见code配置 |
+|其他string| 自定义调用(invoke) | `data`,`res` | 需要用户定义函数| 需要自定义返回状态码，见code配置 |
 
+* 当返回的response为可解析的json时, `ready`和`final`的第一个参数，传入值为解析后的对象；
+* 当返回的response为不是json时，`ready`和`final`的第一个参数，传入值为字符串；且不会进入invoke；
+* invoke 传入的第一个参数,传入值为解析后的数据字段(data)部分.
 
 ### 3.4 code (状态码表)
 
@@ -179,7 +186,7 @@ YYF({
 });
 ```
 
-## 4. Vue插件
+## 4. Vue 插件
 
 YYFJS 支持Vue插件
 
@@ -199,3 +206,72 @@ Vue.use(YYF,{/*配置*/});
 ### 4.3 模块内使用
 
 模块内部 使用 `this.$yyf`即可，相当于调用YYF
+
+exemple
+```
+var app = new Vue({
+  el: '#app',
+  mounted(){
+      this.$yyf.get('/');
+  }
+})
+```
+
+## 5. Flowchart (流程图)
+
+基本流程: `response` => `ready()` =?=> `[INVOKE]()` ==> `final()`
+
+收到响应(response)后的处理流程：
+
+1. ready: 如果存在`ready`则先执行ready,返回值为false时直接进入第3步(final)，否则进入第2部(invoke)
+2. invoke: 根据status状态调用对应处理函数，如未定义调用默认配置,如果都未定义直接到第3步(final)
+3. final：如果存在`final`回调函数，则执行此函数，否则结束
+
+>
+```
+       +-------+
+       | START |
+       +---+---+
+           |
+      +----v----+
+      | REQUEST |
+      +----+----+
+           |
+           v
+      +-----+----+
+      | RESPONSE |
+      +----+-----+
+           |
+           v
+    +-------------+
+    |             |       +==========+
+    | has "ready" |       |          |
+    |  handler ?  +-----> |  ready() |
+    |             | YES   |          |
+    +------+------+       +==========+
+           |                   |
+        NO |                   |
+           v                   |
+    +============+         +---v----+
+    |  [INVOKE]  |         |        |
+    | -success() |         | return |
+    | -fail()    | <-------+ TRUE ? |
+    | -auth()    |    YES  |        |
+    |  ...       |         +---+----+
+    +============+             |
+           |                   | NO
+           v                   |(skip)
+    +------+------+            |
+    |             | <----------+
+    | has "final" |
+    |  handler ?  |        +=========+
+    |             +------> |         |
+    +------+------+  YES   | final() |
+           |               |         |
+        NO |               +=========+
+           v                   |
+      +----+----+              |
+      |  DONE   | <------------+
+      +---------+
+```
+>

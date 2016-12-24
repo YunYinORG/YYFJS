@@ -34,7 +34,6 @@
         },
 
         handle: { //default handlers
-            auth: function() {},
             onerror: console.error, //default handle for network error            
             success: function() {},
             fail: function() {}
@@ -143,10 +142,10 @@
                 console.log(this.status, this.responseText);
             }
             if (this.readyState === 4) { //XMLHttpRequest.DONE
-                if (this.status >= 200 && this.status < 300) {
+                if (this.status >= 300) {
+                    that.getHandle('onerror')(this);
+                } else if (this.status >= 200) {
                     that._handle(this.responseText.trim(), this);
-                } else {
-                    that.getHandle('onerror');
                 }
             }
         };
@@ -154,21 +153,28 @@
             if (DEBUG) {
                 console.debug(response);
             }
-            var handler = that.getHandle('complete');
+            //ready
+            var handler = that.getHandle('ready');
             try {
                 var response = JSON.parse(response);
             } catch (e) { // not json
             }
+            // invoke
             if ((!handler) || (handler(response, res) && typeof response == "object")) {
                 //no handler，or handler return true
                 if (CONFIG.status in response) { // get status
                     var status = CONFIG._codeMap[response[CONFIG.status]];
                     handler = that.getHandle(status);
-                    response = response[CONFIG.data]
+                    handler(response[CONFIG.data], res);
                 } else { //no 'status' key in response
                     handler = that.getHandle('onerror');
+                    handler(response, res);
                 }
-                handler(response, res);
+            }
+            //final
+            handle = that.getHandle('final');
+            if (handle) {
+                handle(response, res);
             }
         };
         return that;
@@ -207,7 +213,7 @@
             return this.request(url, m.toUpperCase(), data, async);
         };
     });
-    ['success', 'fail', 'auth', 'complete'].forEach(function(status) { //handlers
+    ['success', 'fail', 'auth', 'ready', 'final'].forEach(function(status) { //handlers
         yyf.prototype[status] = function(callback) {
             return this.setHandle(status, callback);
         }
@@ -273,11 +279,11 @@
         window.Vue.use(install);
     } else {
         YYF.install = install;
-        if (typeof module !== 'undefined' && typeof exports === 'object') {
+        if (typeof module !== 'undefined' && typeof exports === 'object') { //require
             module.exports = YYF;
-        } else if (typeof define === 'function' && define.amd) {
+        } else if (typeof define === 'function' && define.amd) { //amd
             define(function() { return YYF; });
-        } else {
+        } else { //window
             this.YYF = YYF;
         }
     }
