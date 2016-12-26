@@ -56,7 +56,8 @@
         this._TYPE = typeof type === 'undefined' ? CONFIG.type : type;
     }
     Http.prototype = {
-        _format: function(data, req) { // format data and request header
+        // format data and request header
+        _format: function(data, req) {
             switch (this._TYPE.toLowerCase()) {
                 case 'urlencoded':
                 case 'url': //send as urlencoded form
@@ -90,7 +91,8 @@
             }
             return data;
         },
-        _send: function(url, data, callback) { //send request
+        //send xhr request
+        _send: function(url, data, callback) {
             var self = this;
             var request = new XMLHttpRequest();
             var headers = CONFIG.headers;
@@ -104,8 +106,8 @@
             }
 
             url = CONFIG.root + url;
-
-            if (beforeHandler) { //before Hook
+            //before Hook
+            if (beforeHandler) {
                 headers = Object.assign({}, headers); //copy headers
                 key = beforeHandler(data, headers, url, self._METHOD, request);
                 if (key !== undefined) { // using return as data
@@ -113,16 +115,16 @@
                 }
             }
 
-            //open
+            //initialize request with URL and open
             if (self._METHOD == 'GET' && data) { //get serialize
                 url += '?' + serialize(data);
                 data = null;
             }
-            // initialize request with URL and send
+            request.open(self._METHOD, url, self._ASYNC);
+
             if (DEBUG) {
                 console.log(url);
             }
-            request.open(self._METHOD, url, self._ASYNC);
 
             if (data && self._TYPE) { //format data and set Content-Type
                 data = self._format(data, request);
@@ -132,9 +134,6 @@
                     request.setRequestHeader(key, headers[key]);
                 }
             }
-            // Object.keys(headers).forEach(function(key){
-            //     request.setRequestHeader(key, headers[key]);
-            // });
             request.withCredentials = CONFIG.cookie;
             request.send(data);
             return self;
@@ -146,7 +145,8 @@
      */
     function yyf() {
         var self = this;
-        self._onload = function() { // status change
+        // status change for http request
+        self._onload = function() {
             if (DEBUG) {
                 console.log(this.status, this.responseText);
             }
@@ -158,7 +158,8 @@
                 }
             }
         };
-        self._handle = function(response, res) { //default resolve response
+        //default resolve response
+        self._handle = function(response, res) {
             if (DEBUG) {
                 console.debug(response);
             }
@@ -168,7 +169,6 @@
                 response = JSON.parse(response);
             } catch (e) { // not json
             }
-
             // invoke
             if ((!(handler && (handler(response, res) === false))) && (typeof response == 'object')) {
                 //no handler，or handler return false
@@ -195,7 +195,7 @@
             } else if (typeof key === 'function') {
                 this._handle = key;
             } else if (DEBUG) {
-                console.log('it\'s not callable', key, callback);
+                console.log('not callable', key, callback);
             }
             return this;
         },
@@ -217,11 +217,13 @@
             return this.request('DELETE', url, null, async);
         }
     };
-    ['get', 'put', 'post', 'patch'].forEach(function(m) { // method
+    // apply all REST method
+    ['get', 'put', 'post', 'patch'].forEach(function(m) {
         yyf.prototype[m] = function(url, data, async) {
             return this.request(m.toUpperCase(), url, data, async);
         };
     });
+    //apply headers interfaces
     ['success', 'fail', 'auth', 'ready', 'final', 'onerror'].forEach(function(status) { //handlers
         yyf.prototype[status] = function(callback) {
             return this.setHandle(status, callback);
@@ -259,7 +261,6 @@
         }
         return YYF;
     };
-
     // apply yyf interfaces
     for (var func in yyf.prototype) { // yyf interfaces
         YYF[func] = function(name) {
@@ -268,7 +269,6 @@
             };
         }(func);
     }
-
     // setCode interfaces
     YYF.setCode = function(code, status) { //set code
         CONFIG._setCode(code, status);
