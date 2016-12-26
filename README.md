@@ -60,11 +60,12 @@ YYF.post('Resource/id', data)
 
 所有请求接口 返回均为`当前yyf`对象可以继续操作
 
-* GET操作:`get(uri, data, async)`
-* POST操作:`post(uri, data, async)`
-* PUT操作:`put(uri, data, async)`
-* PATCH操作：`patch(uri, data, async)`
-* DELETE操作:`delete(uri,async)`
+* `get(uri, data, async)`: GET操作
+* `post(uri, data, async)`: POST操作
+* `put(uri, data, async)`: PUT操作
+* `patch(uri, data, async)`: PATCH操作
+* `delete(uri,async)`: DELETE操作
+* `request(method, url, data, async)`: 自定义请求
 
 参数表
 
@@ -135,9 +136,9 @@ YYF({
 **全局默认配置**，每次请求可能都有同样的设置，可以提前统一配置。
 
 | 键(key) | 类型(type)|     说明         | 默认(value)| 备注 |
-| :------ |:--------:| :---------------:| :----------:|------|
-| `root`  | `string` | 请求API地址前缀    | `"/"`       |完整url或相对根目录,同站请求无需域名 |
-|`headers`| `Object` | 附加http头(键值对) | `{}`        | 此请求头在所有的请求中均会加上|
+| :------ |:--------:| :---------------| :----------:|：------|
+| `root`  | `string` | 请求API地址前缀   | `""`       | 通常为站点根目录,同站请求无需域名 |
+|`headers`| `Object` | 附加http头(键值对) | `{}`        | 所有的请求中，添加此请求头|
 | `cookie`|  `bool`  |(跨域)是否带cookie | `false`      | 仅对跨域设置有效 |
 | `async` |  `bool`  |  异步或者同步请求  | `true`       | `false`时可阻塞js,根据需要设置 |
 | `status`| `string` | 返回的`状态`标识字段| `"status"`  | 与服务器上rest.status配置保持一致 |
@@ -154,15 +155,15 @@ YYF({
 例如，通常,认证失败和网络错误预设一个统一的回调方式来提示用户
 
 | 键(key) |     说明        | 回调参数表 |  默认值(value) | 触发条件和说明 |
-| :------ |:---------------| :-------:|:-------------:|------|
+| :------ |:---------------| :-------:|:-------------:|:------|
 |`onerror`| 请求失败或解析出错| 请求对象|`console.error`| 网络，服务器错误或解析出错 |
 | `before`| 请求预处理   |`data`,`headers`,<br/>`url`,`method`,`XHR`|`undefined`|发送请求前调用,可拦截request和修改发送数据|
-| `ready` | 回调拦截,返回true执行后续|`response`,`res`|`undefined`| 收到返回数据首先执行此操作|
+| `ready` | 回调拦截,返回false终止分发|`response`,`res`|`undefined`| 收到返回数据首先执行此操作|
 | `final` | 所有处理结束后,最后执行|`response`,`res`|`undefined`| 返回正常处理最后触发此操作 |
 | `auth`  | 认证失败默认回调  | `data`,`res` | `undefined`| 返回`status`状态为`-1`(可设置) |
 |`success`| 操作成功默认回调  | `data`,`res` | `function(){}`| 返回`status`状态为`1`(可设置) |
 | `fail`  | 操作失败默认回调  | `data`,`res` | `function(){}`| 返回`status`状态为`0`(可设置) |
-|其他string| 自定义调用(invoke) | `data`,`res` | 需要用户定义函数| 需自定义状态码，见[code配置](#34-code) |
+|其他| 自定义调用(invoke) | `data`,`res` | 用户定义函数| 需自定义状态码，见[code配置](#34-code) |
 
 说明:
 
@@ -171,7 +172,7 @@ YYF({
 * 当返回的response为可解析的json时, `ready`和`final`的第一个参数，传入值为解析后的对象；
 * 当返回的response为不是json时，`ready`和`final`的第一个参数，传入值为字符串；且不会进入invoke；
 * invoke 传入的第一个参数,传入值为解析后的数据字段(data)部分.
-* 如果设置了`ready`,且函数执行返回`false`(完全`===`**false**),可跳过 invoke直接进入`final` [详细流程](#5-flowchart-)
+* 如果设置了`ready`,且函数执行返回`false`(完全`===`**false**),可跳过 invoke直接进入`final` [详细流程](#5-flowchart)
 
 ### 3.4 code
 
@@ -233,33 +234,34 @@ var app = new Vue({
 
 收到响应(response)后的处理流程：
 
-0. before: 发送http请求之前调用，如果有全局before,则调用before,如果有返回值，用来设置data数据
-1. 发送http请求，等待响应
-2. ready: 如果存在`ready`则先执行ready,返回值为false时直接进入第4步(final)，否则进入第3部(invoke)
-3. invoke: 根据status状态调用对应处理函数，如未定义调用默认配置,如果都未定义直接到第4步(final)
-4. final：如果存在`final`回调函数，则执行此函数，否则结束
-5. 结束
+1. before: 发送http请求之前调用，如果有全局before,则调用before,如果有返回值，用来设置data数据
+2. 发送http请求，等待响应
+3. ready: 如果存在`ready`则先执行ready,返回值为`false`时直接进入第5步(final)，否则进入第4步(invoke)
+4. invoke: 根据status状态调用对应处理函数，如未定义调用默认配置,如果都未定义直接到第5步(final)
+5. final：如果存在`final`回调函数，则执行此函数，否则结束
+6. 结束
 
 流程图如下
 
 >
 ```
-      +-------+         +==========+
+      +~~~~~~~+         +==========+
       | START +-------> | before() |
-      +-------+         +==========+
+      +~~~~~~~+         +==========+
                              |
                              v
-      +----------+------+----+----+
+      +----------------------+----+
       | RESPONSE  <-----  REQUEST |
-      +----------+------+---------+
-           |
-           v
+      +-----------------+---------+
+        OK |            | error      +===========+
+           |            +----------> | onerror() |
+           V                         +===========+
     +-------------+
-    |             |       +==========+
-    | has "ready" |       |          |
-    |  handler ?  +------>|  ready() |
-    |             | YES   |          |
-    +------+------+       +==========+
+    |             |       +=========+
+    | has "ready" |       |         |
+    |  handler ?  +------>| ready() |
+    |             | YES   |         |
+    +------+------+       +=========+
         NO |                   |
            |                   |
            v                   |
@@ -281,8 +283,8 @@ var app = new Vue({
         NO |               |         |
            |               +=========+
            v                   |
-      +----+----+              |
+      +~~~~+~~~~+              |
       |  DONE   | <------------+
-      +---------+
+      +~~~~~~~~~+
 ```
 >

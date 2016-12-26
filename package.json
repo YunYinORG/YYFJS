@@ -1,7 +1,7 @@
 {
     "name": "yyfjs",
-    "version": "1.1.22-beta.3",
-    "title": "YYFjs",
+    "version": "1.1.22",
+    "title": "YYF js",
     "description": "YYF前端请求和数据接口JS库, the frontend JavaScript lib for YYF RESTful API request",
     "main": "lib/yyf.js",
     "browser": "lib/yyf.js",
@@ -12,6 +12,40 @@
     "devDependencies": {
         "uglify-js": "*"
     },
+    "eslintConfig": {
+        "env": {
+            "browser": true,
+            "amd": true,
+            "node": true
+        },
+        "extends": "eslint:recommended",
+        "parserOptions": {
+            "sourceType": "module",
+            "ecmaFeatures": {
+                "impliedStrict": true
+            }
+        },
+        "rules": {
+            "no-console": 0,
+            "indent": [
+                "warn",
+                4,
+                { "SwitchCase": 1 }
+            ],
+            "no-fallthrough": [
+                "error",
+                { "commentPattern": "break[\\s\\w]*omitted" }
+            ],
+            "quotes": [
+                "warn",
+                "single"
+            ],
+            "semi": [
+                "error",
+                "always"
+            ]
+        }
+    },
     "files": [
         "lib/"
     ],
@@ -19,11 +53,6 @@
         "type": "git",
         "url": "git+https://github.com/YunYinORG/YYFJS.git"
     },
-    "keywords": [
-        "YYF",
-        "RESTFUL",
-        "API"
-    ],
     "author": "New Future",
     "license": "Apache-2.0",
     "bugs": {
