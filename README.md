@@ -7,7 +7,6 @@ The frontend JavaScript library for YYF RESTful API request.
 [![Build Status](https://travis-ci.org/YunYinORG/YYFJS.svg?branch=master)](https://travis-ci.org/YunYinORG/YYFJS)
 [![npm](https://img.shields.io/npm/v/yyfjs.svg)](https://www.npmjs.com/package/yyfjs)
 
-
 1. [安装和使用](#1-install)
 2. [接口API](#2-interface)
 3. [配置](#3-configure)
@@ -175,7 +174,7 @@ YYF({
 | 键(key) |     说明        | 回调参数表 |  默认值(value) | 触发条件和说明 |
 | :------ |:---------------| :-------:|:-------------:|:------|
 |`onerror`| 请求失败或解析出错| 请求对象|`console.error`| 网络，服务器错误或解析出错 |
-| `before`| 请求预处理   |`data`,`headers`,<br/>`url`,`method`,`XHR`|`undefined`|发送请求前调用,可拦截request和修改发送数据|
+| `before`| 请求预处理(全局)|`data`,`headers`,<br/>`url`,`method`,`XHR`|`undefined`|发送请求前调用,可拦截request和修改发送数据|
 | `ready` | 回调拦截,返回false终止分发|`response`,`res`|`undefined`| 收到返回数据首先执行此操作|
 | `final` | 所有处理结束后,最后执行|`response`,`res`|`undefined`| 返回正常处理最后触发此操作 |
 | `auth`  | 认证失败默认回调  | `data`,`res` | `undefined`| 返回`status`状态为`-1`(可设置) |
