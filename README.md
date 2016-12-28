@@ -31,6 +31,7 @@ YYF.get('Index/test').success(console.log);
 可以在[unpkg上](unpkg..com/yyfjs)下载最新版代码
 
 Just include the lib,exemple:
+
 ```html
 <html>
 <head>
@@ -50,6 +51,7 @@ Just include the lib,exemple:
 ### 2.1 Examples
 
 * 快速定义
+
 ```js
 YYF('https;//yyf.yunyin.org/index.php/');
 YYF.success(function(data) {
@@ -58,7 +60,9 @@ YYF.success(function(data) {
     alert('fail:' + data);
 }).get('Index/test');
 ```
+
 * 也可以把回调置后
+
 ```js
 YYF.post('Resource/id', data)
 .ready(function(response) {
@@ -113,6 +117,7 @@ YYF.post('Resource/id', data)
 ### 3.1 global Configure
 
 * 快速设置API请求站点相对更地址 `YYF(root)`
+
 ```js
 /*简单配置*/
 //如请求API是index.php ，如果不配置root为"/"
@@ -120,7 +125,9 @@ YYF('/index.php/');
 //跨站需要带上URL
 YYF('https://yyf.yunyin.org/');
 ```
+
 * 多参数设置`YYF(options,handle,codeMap)`
+
 ```js
 //基本配置
 var options = { //options 参数
@@ -139,7 +146,9 @@ var handlers = { //默认回调
 //options和handler,后面参数可省略
 YYF(options, handlers);
 ```
+
 * 单参数全部设置`YYF({})`
+
 ```js
 //all in one,
 YYF({
@@ -236,6 +245,7 @@ Vue.use(YYF,{/*配置*/});
 模块内部 使用 `this.$yyf`即可，相当于调用YYF
 
 exemple
+
 ```js
 var app = new Vue({
   el: '#app',
