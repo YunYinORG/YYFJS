@@ -1,24 +1,54 @@
-language: node_js
+#Reference from https://github.com/NewFuture/travis-page
 sudo: false
+language: node_js
 
-git:
-  depth: 2
+env:
+  global:
+    - BUILD_PATH: "lib" #the build folder to deploy[生成发布的目录] 
+    - GIT_AUTHOR_NAME: "NewFuture" #username[用户名]
+    - GH_BRANCH: "gh-pages" #branches to push
+    # auto generation and detection 默认下面变量会自动配置GIT变量
+    - GIT_REF: "$(git ls-remote --get-url|sed \"s#://#&${GH_TOKEN}@#\")"
+    - GIT_AUTHOR_EMAIL: "${GIT_AUTHOR_NAME}@users.noreply.github.com"
+    - GIT_COMMITTER_NAME: "${GIT_AUTHOR_NAME}"
+    - GIT_COMMITTER_EMAIL: "${GIT_COMMITTER_NAME}@users.noreply.github.com"
 
 
-install: 
-  - npm install
+install: npm install
 
 
-# build and test
-script:
+# before_script:
+#   - base64 -d <<< $RSAKEY > ~/.ssh/id_rsa
+#   - chmod 600 ~/.ssh/id_rsa
+
+script: #下面替换成运行生成命令或者脚本
   - npm run p
   - npm run test
+  - if [[ "$TRAVIS_TAG" ]] ;then
+      VERSION="$BUILD_PATH/`sed 's/^[^0-9]*//' <<<$TRAVIS_TAG `";
+      mkdir $VERSION;
+      cp $BUILD_PATH/*.js  $VERSION && cp README.md  $VERSION/index.md;
+    fi;
+
+after_success:
+  # update lib
+  - cp README.md $BUILD_PATH/
+  - cd $BUILD_PATH
+  - test ${TRAVIS_PULL_REQUEST} == true || git init
+  - git remote add origin ${GIT_REF} && git fetch origin --depth=1
+  - if [ "`git branch -r --list origin/${GH_BRANCH}`" ] ; then
+        git reset origin/${GH_BRANCH};
+    else
+        git checkout -b ${GH_BRANCH};
+    fi;
+  - git add . && git commit -m "[skip ci] auto build $(date -I)"
+  - git push origin HEAD:${GH_BRANCH} -q
 
 
 # 自动发布
 deploy:
   - provider: npm
-    email: travis@newfututre.cc
+    email: npmjs@newfututre.cc
     api_key: "${NPM_TOKEN}"
     skip_cleanup: true
     on:
@@ -27,8 +57,18 @@ deploy:
 
   - provider: releases
     api_key: "${GH_TOKEN}"
-    file: "lib/yyf.js"
+    file: "$BUILD_PATH/yyf.js"
     skip_cleanup: true
     on:
       tags: true
       branch: master
+
+
+git: #clone 目录深度 1 提高速度
+  depth: 1
+
+
+notifications:
+  email:
+    on_failure: change
+    on_success: change
