@@ -1,11 +1,13 @@
 # YYFJS
 
-YYF前端请求和数据接口JS库。
+[YYF](https://github.com/YunYinORG/YYF)前端请求和数据接口封装JS库。
 
-The frontend JavaScript library for YYF RESTful API request.
+The frontend JavaScript library for [YYF](https://github.com/YunYinORG/YYF) RESTful API request.
 
 [![Build Status](https://travis-ci.org/YunYinORG/YYFJS.svg?branch=master)](https://travis-ci.org/YunYinORG/YYFJS)
 [![npm](https://img.shields.io/npm/v/yyfjs.svg)](https://www.npmjs.com/package/yyfjs)
+[![lib size](http://img.badgesize.io/YunYinORG/YYFJS/gh-pages/yyf.js?color=green)](https://github.com/YunYinORG/YYFJS/tree/gh-pages)
+[![lib gzip size](http://img.badgesize.io/https://unpkg.com/yyfjs?compression=gzip&label=gzip)](https://unpkg.com/yyfjs)
 
 1. [安装和使用](#1-install)
 2. [接口API](#2-interface)
@@ -13,7 +15,12 @@ The frontend JavaScript library for YYF RESTful API request.
 4. [Vue插件](#4-vue)
 5. [流程图](#5-flowchart)
 
-## 1. Install
+在线演示示例：
+
+* [jsfiddle.net](https://jsfiddle.net/NewFuture/56oyup6f/)
+* [runjs.cn(墙内友好)](http://runjs.cn/code/j62fwfuw)
+
+## 1-Install
 **安装**
 
 ### with npm(使用npm安装)
@@ -28,14 +35,15 @@ YYF.get('Index/test').success(console.log);
 
 ### in Browser(浏览器中直接使用)
 
-可以在[unpkg上](unpkg..com/yyfjs)下载最新版代码
+* [gh-pages 分支](https://github.com/YunYinORG/YYFJS/tree/gh-pages)稳定版和最新开发版
+* 也可以在[unpkg.com/yyfjs/](http://unpkg.com/yyfjs/)下载最新版发布版代码
 
 Just include the lib,exemple:
 
 ```html
 <html>
 <head>
-  <script src="http://unpkg..com/yyfjs"></script>
+  <script src="http://unpkg.com/yyfjs"></script>
 </head>
 <body>
   <script>
@@ -45,7 +53,7 @@ Just include the lib,exemple:
 </html>
 ```
 
-## 2. Interface 
+## 2-Interface 
 **方法接口和API**
 
 ### 2.1 Examples
@@ -110,7 +118,7 @@ YYF.post('Resource/id', data)
 
 参数细节参照[全局回调函数表handle](#33-handle)
 
-## 3. Configure
+## 3-Configure
 
 **配置**
 
@@ -223,7 +231,7 @@ YYF({
 });
 ```
 
-## 4. Vue
+## 4-Vue
 
 YYFJS 支持[Vue](https://vuejs.org/)插件
 
@@ -255,7 +263,7 @@ var app = new Vue({
 })
 ```
 
-## 5. Flowchart
+## 5-Flowchart
 
 基本流程: `before()`==> [send request] => `ready()` ==> `[INVOKE?]()` ==> `final()`
 
