@@ -1,0 +1,20 @@
+#!/bin/sh
+
+uglifyjs lib/yyf.js \
+  -m \
+  -r yyf \
+  --mangle-props \
+  --mangle-regex='/^_/' \
+  -c booleans=false \
+  -c comparisons=true \
+  -c conditionals=true \
+  -c drop_debugger=true \
+  -c drop_console=true \
+  -c evaluate=true \
+  -c if_return=true \
+  -c join_vars=true \
+  -c sequences=true \
+  -c unused=true \
+  -d DEBUG=false \
+  -o lib/yyf.min.js \
+  && ls -al lib

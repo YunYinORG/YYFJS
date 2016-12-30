@@ -17,11 +17,8 @@ env:
 install: npm install
 
 
-# before_script:
-#   - base64 -d <<< $RSAKEY > ~/.ssh/id_rsa
-#   - chmod 600 ~/.ssh/id_rsa
-
 script: #下面替换成运行生成命令或者脚本
+  - npm run build
   - npm run p
   - npm run test
   - if [[ "$TRAVIS_TAG" ]] ;then
@@ -57,7 +54,9 @@ deploy:
 
   - provider: releases
     api_key: "${GH_TOKEN}"
-    file: "$BUILD_PATH/yyf.js"
+    file:
+      - "$BUILD_PATH/yyf.js"
+      - "$BUILD_PATH/yyf.min.js"
     skip_cleanup: true
     on:
       tags: true
