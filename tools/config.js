@@ -10,7 +10,7 @@ var input = path.resolve(__dirname, '../src/yyf.js');
 var banner = '/*!\n' +
     ' * YYFJS v' + version + '\n' +
     ' * (c)2016-' + new Date().getFullYear() + ' NewFuture@yunyin.org\n' +
-    ' * Apache License.\n' +
+    ' * @license Apache2.0\n' +
     ' */\n';
 
 module.exports = {
