@@ -8,14 +8,10 @@ env:
     - GIT_AUTHOR_NAME: "NewFuture" #username[用户名]
     - GH_BRANCH: "gh-pages" #branches to push
     # auto generation and detection 默认下面变量会自动配置GIT变量
-    - GIT_REF: "$(git ls-remote --get-url)"
+    - GIT_REF: "$(git ls-remote --get-url|sed \"s#://#&${GH_TOKEN}@#\")"
     - GIT_AUTHOR_EMAIL: "${GIT_AUTHOR_NAME}@users.noreply.github.com"
     - GIT_COMMITTER_NAME: "${GIT_AUTHOR_NAME}"
     - GIT_COMMITTER_EMAIL: "${GIT_COMMITTER_NAME}@users.noreply.github.com"
-
-
-before_install:
-  - GIT_REF=`sed "s#://#&${GH_TOKEN}@#"<<<$GIT_REF`;
 
 install: npm install
 
