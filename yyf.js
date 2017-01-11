@@ -1,6 +1,6 @@
 /*!
  * YYFJS v1.2.0-beta
- * (c)2016-2016 NewFuture@yunyin.org
+ * (c)2016-2017 NewFuture@yunyin.org
  * @license Apache2.0
  */
 (function() {
