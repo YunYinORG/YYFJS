@@ -3,6 +3,11 @@
     "version": "1.2.0-beta",
     "title": "YYF js",
     "description": "YYF前端请求和数据接口JS库, the frontend JavaScript lib for YYF RESTful API request",
+    "keywords": [
+        "YYF",
+        "RESTful API",
+        "http request"
+    ],
     "main": "lib/yyf.js",
     "browser": "lib/yyf.js",
     "unpkg": "lib/yyf.min.js",
@@ -32,11 +37,15 @@
             "indent": [
                 "warn",
                 4,
-                { "SwitchCase": 1 }
+                {
+                    "SwitchCase": 1
+                }
             ],
             "no-fallthrough": [
                 "error",
-                { "commentPattern": "break[\\s\\w]*omitted" }
+                {
+                    "commentPattern": "break[\\s\\w]*omitted"
+                }
             ],
             "quotes": [
                 "warn",
