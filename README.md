@@ -24,17 +24,17 @@ The frontend JavaScript library for [YYF](https://github.com/YunYinORG/YYF) REST
 
 ## Install
 
-### 安装方式
+### 1.1 安装方式
 
 * with `<script>`(直接引入) : `<script src="http://unpkg.com/yyfjs"></script>`
 * with npm(使用npm 包安装) : `npm i yyfjs -S` 
 * with bower(使用bower安装) : `bower i yyfjs -S` 
 
-### Minimal usage(示例)
+### 1.2 Minimal usage(示例)
 * [gh-pages 分支](https://github.com/YunYinORG/YYFJS/tree/gh-pages)稳定版和最新开发版
 * 也可以在[unpkg.com/yyfjs/](http://unpkg.com/yyfjs/)下载最新版发布版代码
 
-#### 1. in Browser(浏览器中直接使用)
+#### 1.2.1 In Browser(浏览器中直接使用)
 ```html
 <html>
 <head>
@@ -48,7 +48,7 @@ The frontend JavaScript library for [YYF](https://github.com/YunYinORG/YYF) REST
 </html>
 ```
 
-#### 2. using package (包管理方式）
+#### 1.2.2 Using package (包管理方式）
 
 ```js
 var YYF=require('yyfjs');
