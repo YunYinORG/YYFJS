@@ -3,67 +3,69 @@
  * A REST API request lib
  * @module yyfjs
  * @see module:yyfjs
+ * @namespace yyfjs
  * @author NewFuture
  */
-(/** @lends module:yyfjs*/function () {
+(/** @lends yyfjs*/function () {
     'use strict';
     var DEBUG = true;
 
     /**
-     * @interface YYF~Options
+     * @interface yyfjs~Options
      * @inner
      */
     var CONFIG = {
         /**
-         * the root of the request url
-         * @memberof YYF~Options
-         * @type {?string}
+         * @alias yyfjs~Options.root?
+         * @desc the root of the request url 
+         * @type {string}
+         * @default ''
          */
         root: '',
 
         /**
-         * request async ? default true.
-         * @memberof YYF~Options
+         * @alias yyfjs~Options.async?
+         * @desc request async ? default true.
          * @type {?boolean}
          * @default true
          */
         async: true,
 
         /**
-         * send with cookie header (withCredentials) when corss site (CORS)
-         * @memberof YYF~Options
+         * @alias yyfjs~Options.cookie?
+         * @desc send with cookie header (withCredentials) when corss site (CORS) 
          * @type {?boolean}
          * @default false
          */
         cookie: false,
 
         /**
-         * request,Content-type,using x-www-form-urlencoded in default
-         * @memberof YYF~Options
-         * @type {?string}
+         * @alias yyfjs~Options.type?
+         * @desc request,Content-type,using x-www-form-urlencoded in default
+         * @type {string}
          * @default 'urlencoded'
          */
         type: 'urlencoded',
 
         /**
-         * default headers in every request
-         * @memberof YYF~Options
-         * @type {?Object.<string, number|string>}
+         * @alias yyfjs~Options.headers?
+         * @desc default headers in every request
+         * @type {Object.<string, number|string>}
          */
         headers: {},
 
         /**
-         * the status field in response
-         * @memberof YYF~Options
-         * @type {?string}
+         * @alias yyfjs~Options.status?
+         * @desc the status field in response
+         * @type {string}
          * @default 'status'
          */
         status: 'status',
 
         /**
-         * the data field in response
-         * @memberof YYF~Options
-         * @type {?string}
+         * @alias yyfjs~Options.data?
+         * @desc the data field in response
+         * @type {string}
          * @default 'data'
          */
         data: 'data',
@@ -89,7 +91,7 @@
         },
 
         _handle: { //default handlers
-            onerror: console.error, //default handle for network error
+            error: console.error, //default handle for network error
             success: function () { },
             fail: function () { }
         },
@@ -97,7 +99,7 @@
 
     /**
      * encode an object to a uri string
-     * @function YYF~serialize
+     * @function yyfjs~serialize
      * @inner
      * @param {any} obj - an object to be serialized as uri string
      * @return {string} - seriladized uri string 
@@ -110,7 +112,7 @@
     }
 
     /**
-     * @class YYF~Http
+     * @class yyfjs~Http
      * @classdesc HTTP request
      * @inner
      * @private
@@ -120,8 +122,8 @@
      */
     function Http(method, async, type) {
         this._METHOD = method || 'GET';
-        this._ASYNC = typeof async === 'undefined' ? CONFIG.async : async;
-        this._TYPE = typeof type === 'undefined' ? CONFIG.type : type;
+        this._ASYNC = typeof async == 'undefined' ? CONFIG.async : async;
+        this._TYPE = typeof type == 'undefined' ? CONFIG.type : type;
     }
     Http.prototype = {
         // format data and request header
@@ -130,7 +132,7 @@
                 case 'urlencoded':
                 case 'url': //send as urlencoded form
                     req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=utf-8');
-                    if (typeof data === 'object') { //serialize onj
+                    if (typeof data == 'object') { //serialize onj
                         return serialize(data);
                     } else {
                         return data;
@@ -138,14 +140,14 @@
 
                 case 'json': //send as json format
                     req.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
-                    if (typeof data === 'object') {
+                    if (typeof data == 'object') {
                         data = JSON.stringify(data);
                     }
                     return data;
 
                 case 'form': //send as form 
                     // req.setRequestHeader('Content-Type', 'multipart/form-data');
-                    if (typeof data === 'object') {
+                    if (typeof data == 'object') {
                         var form = new FormData();
                         for (var i in data) {
                             form.append(i, data[i]);
@@ -210,7 +212,7 @@
     };
 
     /**
-     * @class YYF~yyf
+     * @class yyfjs~yyf
      * @classdesc REST API request
      * @inner
      * @protected
@@ -224,7 +226,7 @@
             }
             if (this.readyState === 4) { //XMLHttpRequest.DONE
                 if (this.status >= 300) {
-                    self.getHandle('onerror')(this);
+                    self.getHandle('error')(this);
                 } else if (this.status >= 200) {
                     self._handle(this.responseText.trim(), this);
                 }
@@ -249,7 +251,7 @@
                         CONFIG._codeMap[response[CONFIG.status]]
                     )(response[CONFIG.data], res);
                 } else { //no 'status' key in response
-                    self.getHandle('onerror')(res, response);
+                    self.getHandle('error')(res, response);
                 }
             }
             //final
@@ -265,28 +267,21 @@
 
         /**
          * set handle for different status
-         * @method YYF~yyf#setHandle
+         * @method yyfjs~yyf#on
          * @param {string} key - status key
-         * @param {YYF~Handler} callback - callback on this status
-         * @return {YYF~yyf} - its self
+         * @param {yyfjs~Handler?} [callback] - callback on this status
+         * @return {yyfjs~yyf} - its self
          */
-        setHandle: function (key, callback) {
-            if (typeof callback !== 'undefined') {
-                this._handle[key] = callback;
-            } else if (typeof key === 'function') {
-                this._handle = key;
-            } else if (DEBUG) {
-                console.error('not callable', key, callback);
-            }
-
+        on: function (key, callback) {
+            this._handle[key] = callback;
             return this;
         },
 
         /**
          * get the handler of status
-         * @method YYF~yyf#getHandle
+         * @method yyfjs~yyf#getHandle
          * @param {string} [status] - status key,empty to get all handlers for current request
-         * @return {YYF~Handler|Object.<string, YYF~Handler>} the handler of the status or all status
+         * @return {yyfjs~Handler|yyfjs~HandlerMap} the handler of the status or all status
          */
         getHandle: function (status) {
             if (status) {
@@ -298,27 +293,27 @@
 
         /**
          * send request
-         * @method YYF~yyf#request
+         * @method yyfjs~yyf#request
          * @param {string} method - request method such as GET POST
          * @param {string} url - request url     
          * @param {any} [data] - request data
          * @param {boolean} [async] - request async or sync default using CONFIG (default false)
-         * @return {YYF~yyf} -its self
+         * @return {yyfjs~yyf} -its self
          */
         request: function (method, url, data, async) { //request resource
             (new Http(method, async))._send(url, data, {
                 'onload': this._onload,
-                'onerror': this.getHandle('onerror')
+                'error': this.getHandle('error')
             });
             return this;
         },
 
         /**
          * quick delete
-         * @method YYF~yyf#delete
+         * @method yyfjs~yyf#delete
          * @param {string} url - request url     
-         * @param {boolean} [async] - request async or sync default using Options (@see YYF~Options)
-         * @return {YYF~yyf} -its self
+         * @param {boolean} [async] - request async or sync default using Options (@see yyfjs~Options)
+         * @return {yyfjs~yyf} -its self
          */
         delete: function (url, async) {
             return this.request('DELETE', url, null, async);
@@ -327,81 +322,88 @@
     // apply all REST method
     ['get', 'put', 'post', 'patch'].forEach(function (m) {
         /**
-         * @name YYF~yyf#get
+         * @name yyfjs~yyf#get
          * @desc send the GET request
          * @method
          * @param {string} url - request url
          * @param {any} [data] - request data    
          * @param {boolean} [async] - request async or sync default using CONFIG (default false)
-         * @return {YYF~yyf} -its self
+         * @return {yyfjs~yyf} -its self
          */
         /**
-         * @name YYF~yyf#post 
+         * @name yyfjs~yyf#post 
          * @desc send the POST request
          * @method
          * @param {string} url - request url
          * @param {any} [data] - request data    
          * @param {boolean} [async] - request async or sync default using CONFIG (default false)
-         * @return {YYF~yyf} -its self
+         * @return {yyfjs~yyf} -its self
          */
         /**
-        * @name YYF~yyf#put 
+        * @name yyfjs~yyf#put 
         * @desc send the PUT request
         * @method
         * @param {string} url - request url
         * @param {any} [data] - request data    
         * @param {boolean} [async] - request async or sync default using CONFIG (default false)
-        * @return {YYF~yyf} -its self
+        * @return {yyfjs~yyf} -its self
         */
         /**
-        * @name YYF~yyf#patch 
+        * @name yyfjs~yyf#patch 
         * @desc send the PATCH request
         * @method
         * @param {string} url - request url
         * @param {any} [data] - request data    
         * @param {boolean} [async] - request async or sync default using CONFIG (default false)
-        * @return {YYF~yyf} -its self
+        * @return {yyfjs~yyf} -its self
         */
         yyf.prototype[m] = function (url, data, async) {
             return this.request(m.toUpperCase(), url, data, async);
         };
     });
     //apply headers interfaces
-    ['success', 'fail', 'auth', 'ready', 'final', 'onerror'].forEach(function (status) { //handlers
+    ['success', 'fail', 'auth', 'ready', 'final', 'error'].forEach(function (status) { //handlers
         /**
-         * @name YYF~yyf#success
+         * @name yyfjs~yyf#success
          * @method
          * @desc the [request level] callback handler when response status is success
-         * @param {YYF~dataHandler} callback - the callback function
-         * @return {YYF~yyf}
+         * @param {yyfjs~dataHandler} callback - the callback function
+         * @return {yyfjs~yyf}
          */
         /**
-        * @name YYF~yyf#fail
+        * @name yyfjs~yyf#fail
         * @method
         * @desc the [request level] callback handler when response status is fail
-        * @param {YYF~dataHandler} callback - the callback function
-        * @return {YYF~yyf}
+        * @param {yyfjs~dataHandler} callback - the callback function
+        * @return {yyfjs~yyf}
         */
         /**
         * @method
-        * @name YYF~yyf#auth
+        * @name yyfjs~yyf#auth
         * @desc the [request level] callback handler when response status is need auth
-        * @param {YYF~dataHandler} callback - the callback function
-        * @return {YYF~yyf}
+        * @param {yyfjs~dataHandler} callback - the callback function
+        * @return {yyfjs~yyf}
         */
         /**
         * @method
-        * @name YYF~yyf#ready
+        * @name yyfjs~yyf#error
+        * @desc the [request level] callback handler when error occurs
+        * @param {yyfjs~dataHandler} callback - the callback function
+        * @return {yyfjs~yyf}
+        */
+        /**
+        * @method
+        * @name yyfjs~yyf#ready
         * @desc the [request level] callback when the request arrived 
-        * @param {YYF~responseHandler} callback - the callback function
-        * @return {YYF~yyf}
+        * @param {yyfjs~responseHandler} callback - the callback function
+        * @return {yyfjs~yyf}
         */
         /**
         * @method
-        * @name YYF~yyf#final
+        * @name yyfjs~yyf#final
         * @desc the [request level] last callback when all handlers completed
-        * @param {YYF~responseHandler} callback - the callback function
-        * @return {YYF~yyf}
+        * @param {yyfjs~responseHandler} callback - the callback function
+        * @return {yyfjs~yyf}
         */
         yyf.prototype[status] = function (callback) {
             return this.setHandle(status, callback);
@@ -409,26 +411,29 @@
     });
 
     /**
-     * @global
-     * @static
-     * @class YYF.YYF
-     * @mixes YYF~yyf
-     * @alias module:yyfjs
-     * @classdesc config the options and create yyf request instance
-     * @param {string|YYF~Options|YYF~Config} options - setting config, string => root
-     * @param {Object.<string, YYF~Handler>} [handlers] - handlers
-     * @param {Object.<string, number>} [codeMap] - code key map
-     * @return {YYF.YYF}
+     * @interface yyfjs.YYF
+     * @borrows yyfjs~yyf#request as request 
+     * @borrows yyfjs~yyf#get as get
+     * @borrows yyfjs~yyf#post as post
+     * @borrows yyfjs~yyf#put as put
+     * @borrows yyfjs~yyf#patch as patch
+     * @borrows yyfjs~yyf#delete as delete
+     * @borrows yyfjs~yyf#on as on 
+     * @borrows yyfjs~yyf#success as success
+     * @borrows yyfjs~yyf#fail as fail
+     * @borrows yyfjs~yyf#ready as ready
+     * @borrows yyfjs~yyf#final as final
+     * @borrows yyfjs~yyf#error as error 
      */
-    var YYF = function (options, handlers, codeMap) {
-        if (arguments.length === 1 && options) {
-            if (typeof options === 'string') { //root
+    function YYF(options, handlers, codeMap) {
+        if (arguments.length == 1 && options) {
+            if (typeof options == 'string') { //root
                 CONFIG['root'] = options;
                 return YYF;
             } else if (
-                typeof options['options'] === 'object' ||
-                typeof options['handle'] === 'object' ||
-                typeof options['code'] === 'object'
+                typeof options['options'] == 'object' ||
+                typeof options['handle'] == 'object' ||
+                typeof options['code'] == 'object'
             ) {
                 handlers = options['handle'];
                 codeMap = options['code'];
@@ -446,7 +451,7 @@
             CONFIG._setCode(codeMap[key], key);
         }
         return YYF;
-    };
+    }
 
     // apply yyf interfaces
     for (var func in yyf.prototype) { // yyf interfaces
@@ -458,37 +463,68 @@
     }
 
     /**
+     * @method yyfjs.YYF.config
+     * @desc config the options and create yyf request instance
+     * @param {string|yyfjs~Options|yyfjs~Config} options - setting config, string => root
+     * @param {yyfjs~HandlerMap} [handlers] - handlers
+     * @param {Object.<string, number>} [codeMap] - code key map
+     * @return {yyfjs.YYF}
+     */
+    YYF.config = function () {
+        return YYF.apply(YYF, arguments);
+    };
+
+    /**
     * set global status code
     * @method
-    * @alias YYF.YYF.setCode
-    * @param {string|number} key - status key
-    * @param {number} callback - callback on this status
-    * @return {YYF.YYF} - return the module
+    * @alias yyfjs.YYF.setCode
+    * @param {string} key - status key,should be the same as the key of handlers，such as 'success'
+    * @param {number} statusCode - the status code for the key such as 0,1
+    * @return {yyfjs.YYF} - return the module
     */
-    YYF.setCode = function (code, status) { //set code
-        CONFIG._setCode(code, status);
+    YYF.setCode = function (key, status) { //set code
+        CONFIG._setCode(key, status);
         return YYF;
     };
 
     /**
-     * get the global handler of status
-     * @method
-     * @alias YYF.YYF.getHandle
+     * @method yyfjs.YYF.getHandle
+     * @desc get the global handler of status
      * @param {string} [status] - status key, empty for all handlers
-     * @return {YYF~Handler|Object.<string, YYF~Handler>} - the global handler of the status or all handlers
+     * @return {yyfjs~Handler|yyfjs~HandlerMap} - the global handler of the status or all handlers
      */
     YYF.getHandle = function (status) { //get default handle
         return status ? CONFIG._handle[status] : CONFIG._handle;
+    };
+
+
+    /**
+     * @desc set global handle for different status
+     * @method
+     * @name yyfjs.YYF.setHandle
+     * @param {string|yyfjs~HandlerMap} key - status key / handlerMap
+     * @param {yyfjs~Handler?} [callback] - callback on this status
+     * @return {yyfjs.YYF} - its self
+     */
+    YYF.setHandle = function (key, callback) {
+        if (typeof callback != 'undefined') {
+            CONFIG._handle[key] = callback;
+        } else if (typeof key == 'function' || typeof key == 'object') {
+            YYF({ handle: key });
+        } else if (DEBUG) {
+            console.error('not callable', key, callback);
+        }
+        return YYF;
     };
 
     /**
      * register YYF to an object prototype
      * so you can use as `obj.YYF` or `(new obj()).$yyf`
      * @method
-     * @alias YYF.YYF.install
+     * @alias yyfjs.YYF.install
      * @param {any} obj - the object such as Vue or Jquery 
-     * @param {string|YYF~Options|YYF~Config} [options] - options
-     * @return {YYF.YYF}
+     * @param {?string|yyfjs~Options|yyfjs~Config} [options] - options
+     * @return {yyfjs.YYF}
      */
     YYF.install = function (obj, options) {
         return obj.YYF = obj.prototype.$yyf = YYF(options);
@@ -497,21 +533,21 @@
     /**
      * Expose 
      */
-    if (typeof window !== 'undefined' && window.Vue) { //Vue auto install
+    if (typeof window != 'undefined' && window.Vue) { //Vue auto install
         window.Vue.use(YYF);
-    } else if (typeof module !== 'undefined' && typeof exports === 'object') { //require
+    } else if (typeof module != 'undefined' && typeof exports == 'object') { //require
         exports = YYF;
-    } else if (typeof define === 'function' && define.amd) { //amd
+    } else if (typeof define == 'function' && define.amd) { //amd
         define(function () { return YYF; });
     } else { //window
         this.YYF = YYF;
     }
 }).call(function () {
-    return this || (typeof window !== 'undefined' ? window : global);
+    return this || (typeof window != 'undefined' ? window : global);
 }());
 
 /**
- * @typedef YYF~Response
+ * @typedef yyfjs~Response
  * @desc the standard response object of the request which conttains data and status
  * @type {object}
  * @property {number} status - the status flag code of the result
@@ -519,44 +555,47 @@
  */
 
 /**
-  * @interface YYF~Config
-  * @desc the Cofig to setting the YYF
-  */
+ * @interface yyfjs~Config
+ * @inner yyfjs
+ * @desc the Cofig to setting the YYF
+ */
 /**
- * @name YYF~Config.options
- * @type {?YYF~Options}
+ * @name yyfjs~Config.options?
+ * @type {yyfjs~Options}
  * @desc the options of the configuration
- * @see YYF~Options
+ * @see yyfjs~Options
  */
 /**
- * @name YYF~Config.code
- * @type {Object.<string, number>}
+ * @name yyfjs~Config.code?
+ * @type {Object.<string, number|string>}
  * @desc the code Map of the configuration
+ * @default {success:1,fail:0,auth:-1}
  */
 /**
- * @name YYF~Config.handle
- * @type {?Object.<string, YYF~Handler>}
+ * @name yyfjs~Config.handle?
+ * @type {yyfjs~HandlerMap}
  * @desc the global handlers for all requests
- */
-
- /**
- * handler callback afeter request
- * @callback YYF~dataHandler
- * @param {any} [data] - response data (without status)
- * @param {?XMLHttpRequest} [request] - this xhr request object
- * @return {boolean|void} - return false to stop next handler event
- */
-
- /**
- * ready (when respone arrives) or final(the last envent) Handler
- * @callback YYF~responseHandler
- * @param {string|YYF~Response} [response] - the full response string or object
- * @param {?XMLHttpRequest} [request] - this xhr request object
- * @return {boolean|void} - return false to stop next handler event
+ * @default {error:console.error}
  */
 
 /**
- * @callback YYF~beforeHandler
+* handler callback afeter request
+* @callback yyfjs~dataHandler
+* @param {any} [data] - response data (without status)
+* @param {?XMLHttpRequest} [request] - this xhr request object
+* @return {boolean|void} - return false to stop next handler event
+*/
+
+/**
+* ready (when respone arrives) or final(the last envent) Handler
+* @callback yyfjs~responseHandler
+* @param {string|yyfjs~Response} [response] - the full response string or object
+* @param {?XMLHttpRequest} [request] - this xhr request object
+* @return {boolean|void} - return false to stop next handler event
+*/
+
+/**
+ * @callback yyfjs~beforeHandler
  * @desc the handler before sending request, can capture or change the data and headers 
  * @param {any} data - the request data
  * @param {any} [headers] - http request header can be modified
@@ -566,17 +605,24 @@
  * @return {any?} - the data undifined means keep before 
  */
 
- /**
-  * @callback YYF~errorHandler
-  * @desc the callback when error occurred  
-  * @param {XMLHttpRequest} [request] - this xhr request object
-  * @param {?string|YYF~Response} [response] - response string or object
-  */
+/**
+ * @callback yyfjs~errorHandler
+ * @desc the callback when error occurred  
+ * @param {XMLHttpRequest} [request] - this xhr request object
+ * @param {?string|yyfjs~Response} [response] - response string or object
+ */
 
-  /**
-  * @typedef {YYF~dataHandler|YYF~responseHandler|YYF~beforeHandler|YYF~errorHandler} YYF~Handler
-  */
+/**
+* @typedef {yyfjs~dataHandler|yyfjs~responseHandler|yyfjs~beforeHandler|yyfjs~errorHandler} yyfjs~Handler
+*/
 
- /**
-  * @typedef {XMLHttpRequest} XMLHttpRequest
-  */
+/**
+ * @typedef yyfjs~HandlerMap
+ * @desc handlers map
+ * @type {Object.<string, yyfjs~Handler>}
+ * @inner
+ */
+
+/**
+* @typedef {XMLHttpRequest} XMLHttpRequest
+*/

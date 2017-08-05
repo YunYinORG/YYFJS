@@ -1,6 +1,6 @@
 {
   "name": "yyfjs",
-  "version": "2.0.2-beta",
+  "version": "2.1.0-beta",
   "title": "YYF.js",
   "description": "the promise-like front-end JavaScript library for YYF RESTful API request client",
   "keywords": [
@@ -15,7 +15,7 @@
   "typings": "lib/yyf.d.ts",
   "scripts": {
     "test": "node lib/yyf.js",
-    "build": "node ./tools/build.js",
+    "build": "npm run tsd && node ./tools/build.js",
     "p": "npm run build && ./tools/product",
     "tsd": "jsdoc --verbose -t ./node_modules/tsd-jsdoc src/yyf.js -d lib/",
     "doc": "jsdoc --verbose -P package.json -R README.md src/yyf.js"
