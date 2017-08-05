@@ -1,13 +1,13 @@
 /**
- * YYF.YYF
+ * YYFJS 
+ * A REST API request lib
  * @module yyfjs
  * @see module:yyfjs
- * @namespace YYF
  * @author NewFuture
  */
-(function () {
+(/** @lends module:yyfjs*/function () {
     'use strict';
-    //remove debug;
+    var DEBUG = true;
 
     /**
      * @interface YYF~Options
@@ -190,7 +190,9 @@
             }
             request.open(self._METHOD, url, self._ASYNC);
 
-            /* remove debug */
+            if (DEBUG) {
+                console.log(url);
+            }
 
 
             if (data && self._TYPE) { //format data and set Content-Type
@@ -217,8 +219,9 @@
         var self = this;
         // status change for http request
         self._onload = function () {
-            /* remove debug */
-
+            if (DEBUG) {
+                console.debug(this.status, this.responseText);
+            }
             if (this.readyState === 4) { //XMLHttpRequest.DONE
                 if (this.status >= 300) {
                     self.getHandle('onerror')(this);
@@ -229,8 +232,9 @@
         };
         //default resolve response
         self._handle = function (response, res) {
-            /* remove debug */
-
+            if (DEBUG) {
+                console.debug(response);
+            }
             //ready
             var handler = self.getHandle('ready');
             try {
@@ -271,7 +275,9 @@
                 this._handle[key] = callback;
             } else if (typeof key === 'function') {
                 this._handle = key;
-            } /* remove debug */
+            } else if (DEBUG) {
+                console.error('not callable', key, callback);
+            }
 
             return this;
         },
@@ -494,9 +500,6 @@
     if (typeof window !== 'undefined' && window.Vue) { //Vue auto install
         window.Vue.use(YYF);
     } else if (typeof module !== 'undefined' && typeof exports === 'object') { //require
-        /**
-         * @exports YYF.YYF
-         */
         exports = YYF;
     } else if (typeof define === 'function' && define.amd) { //amd
         define(function () { return YYF; });
