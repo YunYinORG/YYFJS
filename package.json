@@ -1,6 +1,6 @@
 {
   "name": "yyfjs",
-  "version": "2.0.0-beta",
+  "version": "2.0.2-beta",
   "title": "YYF.js",
   "description": "the promise-like front-end JavaScript library for YYF RESTful API request client",
   "keywords": [

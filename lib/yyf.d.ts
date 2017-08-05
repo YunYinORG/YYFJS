@@ -29,13 +29,13 @@ declare module "yyfjs" {
          * @desc the options of the configuration
          * @see YYF~Options
          */
-        options: Options;
+        options?: Options;
         /**
          * @name YYF~Config.code
          * @type {Object.<string, number>}
          * @desc the code Map of the configuration
          */
-        code: {
+        code?: {
             [key: string]: number;
         };
         /**
@@ -43,7 +43,7 @@ declare module "yyfjs" {
          * @type {?Object.<string, YYF~Handler>}
          * @desc the global handlers for all requests
          */
-        handle: {
+        handle?: {
             [key: string]: Handler;
         };
     }
@@ -101,34 +101,34 @@ declare module "yyfjs" {
          * @memberof YYF~Options
          * @type {?string}
          */
-        root: string;
+        root?: string;
         /**
          * request async ? default true.
          * @memberof YYF~Options
          * @type {?boolean}
          * @default true
          */
-        async: boolean;
+        async?: boolean;
         /**
          * send with cookie header (withCredentials) when corss site (CORS)
          * @memberof YYF~Options
          * @type {?boolean}
          * @default false
          */
-        cookie: boolean;
+        cookie?: boolean;
         /**
          * request,Content-type,using x-www-form-urlencoded in default
          * @memberof YYF~Options
          * @type {?string}
          * @default 'urlencoded'
          */
-        type: string;
+        type?: string;
         /**
          * default headers in every request
          * @memberof YYF~Options
          * @type {?Object.<string, number|string>}
          */
-        headers: {
+        headers?: {
             [key: string]: number | string;
         };
         /**
@@ -137,14 +137,14 @@ declare module "yyfjs" {
          * @type {?string}
          * @default 'status'
          */
-        status: string;
+        status?: string;
         /**
          * the data field in response
          * @memberof YYF~Options
          * @type {?string}
          * @default 'data'
          */
-        data: string;
+        data?: string;
     }
 
     /**
