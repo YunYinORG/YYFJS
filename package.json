@@ -1,27 +1,24 @@
 {
   "name": "yyfjs",
-  "version": "1.3.1",
+  "version": "1.3.3",
   "title": "YYF.js",
   "description": "the promise-like front-end JavaScript library for YYF RESTful API request client",
   "keywords": [
     "YYF",
     "RESTful API",
     "request",
-    "http request"
+    "ajax request"
   ],
-  "main": "src/yyf.js",
-  "browser": "lib/yyf.js",
+  "main": "lib/yyf.js",
+  "browser": "lib/yyf.min.js",
   "unpkg": "lib/yyf.min.js",
+  "typings": "lib/yyf.d.ts",
   "scripts": {
     "test": "node lib/yyf.js",
     "build": "node ./tools/build.js",
-    "p": "npm run build && ./tools/product",
-    "tsd": "jsdoc -t ./node_modules/tsd-jsdoc src/yyf.js",
-    "doc": "jsdoc src/yyf.js"
+    "p": "npm run build && ./tools/product"
   },
   "devDependencies": {
-    "jsdoc": "^3.5.3",
-    "tsd-jsdoc": "^2.0.0-beta.3",
     "uglify-js": "*"
   },
   "eslintConfig": {

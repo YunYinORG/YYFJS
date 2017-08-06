@@ -1,5 +1,6 @@
 /**
  * yyfjs
+ * @module yyfjs
  * @author NewFuture
  */
 
@@ -71,8 +72,8 @@
             auth: -1, // need auth
         },
         _codeMap: { //map code to status for quick search
-            '1': 'success',
-            '0': 'fail',
+            1: 'success',
+            0: 'fail',
             '-1': 'auth',
         },
         _setCode: function (code_num, status_str) { //set code 
@@ -116,8 +117,8 @@
      */
     function Http(method, async, type) {
         this._METHOD = method || 'GET';
-        this._ASYNC = typeof async === 'undefined' ? CONFIG.async : async;
-        this._TYPE = typeof type === 'undefined' ? CONFIG.type : type;
+        this._ASYNC = typeof async == 'undefined' ? CONFIG.async : async;
+        this._TYPE = typeof type == 'undefined' ? CONFIG.type : type;
     }
     Http.prototype = {
         // format data and request header
@@ -126,7 +127,7 @@
                 case 'urlencoded':
                 case 'url': //send as urlencoded form
                     req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded;charset=utf-8');
-                    if (typeof data === 'object') { //serialize onj
+                    if (typeof data == 'object') { //serialize onj
                         return serialize(data);
                     } else {
                         return data;
@@ -134,14 +135,14 @@
 
                 case 'json': //send as json format
                     req.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
-                    if (typeof data === 'object') {
+                    if (typeof data == 'object') {
                         data = JSON.stringify(data);
                     }
                     return data;
 
                 case 'form': //send as form 
                     // req.setRequestHeader('Content-Type', 'multipart/form-data');
-                    if (typeof data === 'object') {
+                    if (typeof data == 'object') {
                         var form = new FormData();
                         for (var i in data) {
                             form.append(i, data[i]);
@@ -262,14 +263,14 @@
          * @method
          * @instance 
          * @memberof yyf
-         * @param {string} key - status key
+         * @param {string|function(response:Resonse,res?:XMLHttpRequest)} key - status key
          * @param {YYFHandler} callback - callback on this status
          * @return {yyf}
          */
         setHandle: function (key, callback) {
-            if (typeof callback !== 'undefined') {
+            if (typeof callback != 'undefined') {
                 this._handle[key] = callback;
-            } else if (typeof key === 'function') {
+            } else if (typeof key == 'function') {
                 this._handle = key;
             } else if (DEBUG) {
                 console.log('not callable', key, callback);
@@ -420,14 +421,14 @@
      * @return {YYF}
      */
     var YYF = function (options, handlers, codeMap) {
-        if (arguments.length === 1 && options) {
-            if (typeof options === 'string') { //root
+        if (arguments.length == 1 && options) {
+            if (typeof options == 'string') { //root
                 CONFIG['root'] = options;
                 return YYF;
             } else if (
-                typeof options['options'] === 'object' ||
-                typeof options['handle'] === 'object' ||
-                typeof options['code'] === 'object'
+                typeof options['options'] == 'object' ||
+                typeof options['handle'] == 'object' ||
+                typeof options['code'] == 'object'
             ) {
                 handlers = options['handle'];
                 codeMap = options['code'];
@@ -575,17 +576,17 @@
     /**
      * Expose 
      */
-    if (typeof window !== 'undefined' && window.Vue) { //Vue auto install
+    if (typeof window != 'undefined' && window.Vue) { //Vue auto install
         window.Vue.use(YYF);
-    } else if (typeof module !== 'undefined' && typeof exports === 'object') { //require
+    } else if (typeof module != 'undefined' && typeof exports == 'object') { //require
         module.exports = YYF;
-    } else if (typeof define === 'function' && define.amd) { //amd
+    } else if (typeof define == 'function' && define.amd) { //amd
         define(function () { return YYF; });
     } else { //window
         this.YYF = YYF;
     }
 }).call(function () {
-    return this || (typeof window !== 'undefined' ? window : global);
+    return this || (typeof window != 'undefined' ? window : global);
 }());
 
 /**
