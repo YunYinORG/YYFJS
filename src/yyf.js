@@ -76,8 +76,8 @@
             auth: -1, // need auth
         },
         _codeMap: { //map code to status for quick search
-            '1': 'success',
-            '0': 'fail',
+            1: 'success',
+            0: 'fail',
             '-1': 'auth',
         },
         _setCode: function (code_num, status_str) { //set code 
@@ -196,7 +196,6 @@
                 console.log(url);
             }
 
-
             if (data && self._TYPE) { //format data and set Content-Type
                 data = self._format(data, request);
             }
@@ -281,7 +280,8 @@
          * @method
          * @desc get all the [request level] handlers map for all status
          * @name yyfjs~yyf#getHandle
-         * @return {Object.<string, yyfjs~Handler>} the handlerMap for all status
+         * @variation 1
+         * @return {Object.<string, yyfjs~Handler>} the [request level] handlerMap for all status
          */
         /**
         * @method yyfjs~yyf#getHandle
@@ -412,7 +412,7 @@
         * @return {yyfjs~yyf}
         */
         yyf.prototype[status] = function (callback) {
-            return this.setHandle(status, callback);
+            return this.on(status, callback);
         };
     });
 
@@ -502,7 +502,6 @@
      */
     /**
      * @method yyfjs.YYF.getHandle
-     * @variation 2
      * @desc get the global handler of status
      * @param {string} status - status key
      * @return {yyfjs~Handler} - the global handler of the status
@@ -514,6 +513,7 @@
     /**
      * @method
      * @name yyfjs.YYF.setHandle
+     * @variation 1 
      * @desc set global handle map
      * @param {Object.<string, yyfjs~Handler>} handlerMap
      * @return {yyfjs.YYF} - its self
@@ -526,12 +526,15 @@
      * @return {yyfjs.YYF} - its self
      */
     YYF.setHandle = function (key, callback) {
-        if (typeof callback != 'undefined') {
+        if (callback) { // key value
             CONFIG._handle[key] = callback;
         } else if (typeof key == 'function' || typeof key == 'object') {
             YYF({ handle: key });
-        } else if (DEBUG) {
-            console.error('not callable', key, callback);
+        } else {
+            if (DEBUG) {
+                console.error('not callable', key, callback);
+            }
+            throw new Error('invalid params:' + key + callback);
         }
         return YYF;
     };
