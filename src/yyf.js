@@ -278,11 +278,17 @@
         },
 
         /**
-         * get the handler of status
-         * @method yyfjs~yyf#getHandle
-         * @param {string} [status] - status key,empty to get all handlers for current request
-         * @return {yyfjs~Handler|yyfjs~HandlerMap} the handler of the status or all status
+         * @method
+         * @desc get all the [request level] handlers map for all status
+         * @name yyfjs~yyf#getHandle
+         * @return {Object.<string, yyfjs~Handler>} the handlerMap for all status
          */
+        /**
+        * @method yyfjs~yyf#getHandle
+        * @desc get the handler of status for current request        
+        * @param {string} status - status key,empty to get all handlers for current request
+        * @return {yyfjs~Handler} the handler of the status
+        */
         getHandle: function (status) {
             if (status) {
                 return this._handle[status] || CONFIG._handle[status];
@@ -466,7 +472,7 @@
      * @method yyfjs.YYF.config
      * @desc config the options and create yyf request instance
      * @param {string|yyfjs~Options|yyfjs~Config} options - setting config, string => root
-     * @param {yyfjs~HandlerMap} [handlers] - handlers
+     * @param {Object.<string, yyfjs~Handler>} [handlersMap] - handlers
      * @param {Object.<string, number>} [codeMap] - code key map
      * @return {yyfjs.YYF}
      */
@@ -488,22 +494,35 @@
     };
 
     /**
+     * @method
+     * @name yyfjs.YYF.getHandle
+     * @variation 1
+     * @desc get all global handlers of every status
+     * @return {Object.<string, yyfjs~Handler>} - the global handler of the status or all handlers
+     */
+    /**
      * @method yyfjs.YYF.getHandle
+     * @variation 2
      * @desc get the global handler of status
-     * @param {string} [status] - status key, empty for all handlers
-     * @return {yyfjs~Handler|yyfjs~HandlerMap} - the global handler of the status or all handlers
+     * @param {string} status - status key
+     * @return {yyfjs~Handler} - the global handler of the status
      */
     YYF.getHandle = function (status) { //get default handle
         return status ? CONFIG._handle[status] : CONFIG._handle;
     };
 
-
     /**
-     * @desc set global handle for different status
      * @method
      * @name yyfjs.YYF.setHandle
-     * @param {string|yyfjs~HandlerMap} key - status key / handlerMap
-     * @param {yyfjs~Handler?} [callback] - callback on this status
+     * @desc set global handle map
+     * @param {Object.<string, yyfjs~Handler>} handlerMap
+     * @return {yyfjs.YYF} - its self
+     */
+    /**
+     * @method yyfjs.YYF.setHandle
+     * @desc set global [default] handler for different status 
+     * @param {string} key - status key
+     * @param {yyfjs~Handler} callback - callback on this status
      * @return {yyfjs.YYF} - its self
      */
     YYF.setHandle = function (key, callback) {
@@ -520,8 +539,7 @@
     /**
      * register YYF to an object prototype
      * so you can use as `obj.YYF` or `(new obj()).$yyf`
-     * @method
-     * @alias yyfjs.YYF.install
+     * @method yyfjs.YYF.install
      * @param {any} obj - the object such as Vue or Jquery 
      * @param {?string|yyfjs~Options|yyfjs~Config} [options] - options
      * @return {yyfjs.YYF}
@@ -573,7 +591,7 @@
  */
 /**
  * @name yyfjs~Config.handle?
- * @type {yyfjs~HandlerMap}
+ * @type {Object.<string, yyfjs~Handler>}
  * @desc the global handlers for all requests
  * @default {error:console.error}
  */
@@ -615,13 +633,6 @@
 /**
 * @typedef {yyfjs~dataHandler|yyfjs~responseHandler|yyfjs~beforeHandler|yyfjs~errorHandler} yyfjs~Handler
 */
-
-/**
- * @typedef yyfjs~HandlerMap
- * @desc handlers map
- * @type {Object.<string, yyfjs~Handler>}
- * @inner
- */
 
 /**
 * @typedef {XMLHttpRequest} XMLHttpRequest
