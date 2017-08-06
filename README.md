@@ -65,7 +65,9 @@ YYF.get('Index/test').success(console.log);
 * 快速定义
 
 ```js
+//设置请求root路径
 YYF('https;//yyf.yunyin.org/index.php/');
+//发送get请求
 YYF.success(function(data) {
     alert('success:' + data);
 }).fail(function(data) {
@@ -115,10 +117,12 @@ YYF.post('Resource/id', data)
     * `success`设置操作成功的回调方法
     * `fail`设置操作失败的回调方法
     * `auth`设置需要回调的回调方法
-    * 自定义回调 `setHandle(key,callback)`
+    * 自定义回调 `on(statuKey,callback)`
 - 通用处理 (正常完成一定执行)
     * `ready`设置拦截返回内容的回调方法(在success和fail等invoke之前)
     * `final`处理完成方法(在success和fail等invoke之后)
+
+- `YYF.setHandle(statuKey,callback)`全局设置默认回调方法(优先级最低)
 
 参数细节参照[全局回调函数表handle](#33-handle)
 
@@ -146,17 +150,22 @@ var options = { //options 参数
     root: 'api.php',
     type: 'json'
 };
-//回调函数
+// 回调函数
 var handlers = { //默认回调
     auth: function(data) { //验证失败回调,默认对应status为-1代表验证失败
         alert("验证失败,请登录!" + data);
     },
-    onerror: function(data) { //网络错误或者解析失败
+    error: function(data) { //网络错误或者解析失败
         console.log('网络错误:', data);
     }
 };
+// 自定义状态映射表
+var codeMap={
+    success:1
+    fail:0
+};
 //options和handler,后面参数可省略
-YYF(options, handlers);
+YYF(options,handlers,codeMap);
 ```
 
 * 单参数全部设置`YYF({})`
@@ -165,7 +174,8 @@ YYF(options, handlers);
 //all in one,
 YYF({
     options: options,
-    handle: handlers
+    handle: handlers,
+    code:codeMap
 });
 ```
 
@@ -293,7 +303,7 @@ var app = new Vue({
       | RESPONSE  <-----  REQUEST |
       +-----------------+---------+
         OK |            | error      +===========+
-           |            +----------> | onerror() |
+           |            +----------> |  error()  |
            V                         +===========+
     +-------------+
     |             |       +=========+

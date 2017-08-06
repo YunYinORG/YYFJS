@@ -1,6 +1,8 @@
 #Reference from https://github.com/NewFuture/travis-page
 sudo: false
 language: node_js
+node_js:
+  - "lts/*"
 
 env:
   global:
