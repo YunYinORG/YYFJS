@@ -14,7 +14,7 @@ function getSize(code) {
 
 function save(file, data) {
     var folder = path.dirname(file);
-    folder.split('/').forEach(function(dir, i, dirs) {
+    folder.split('/').forEach(function (dir, i, dirs) {
         dir = path.resolve(dirs.slice(0, i + 1).join('/'));
         if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir);
@@ -62,4 +62,26 @@ function build(from, banner) {
     return (banner || '') + code;
 }
 
+
+function tsd(typesfile) {
+    var types = fs.readFileSync(typesfile).toString();
+    var module_declare = 'declare const YYF: yyfjs.YYF;\ndeclare module "yyfjs" { export = YYF; }';
+    var XMLHttpRequest_reg = /\/\*\*\s*\*\s+@typedef\s+\{XMLHttpRequest\}[\s\S]*XMLHttpRequest\s?\=\s?XMLHttpRequest\;/;
+    types = types.replace(XMLHttpRequest_reg, module_declare);
+
+    var optional_reg = /\"\w+\?\"/g;
+    types = types.replace(optional_reg, function (s) {
+        return s.substring(1, s.length - 1);
+    });
+
+    var config_reg = /\s*config\(.+[\w\W]*?\)\W?\:\W+YYF\;/;
+    types = types.replace(config_reg, function (s) {
+        return s + s.replace('config', '');
+    });
+    return types;
+}
 save(config.OUTPUT, build(config.INPUT, config.BANNER));
+var typesfile = config.LIB + '/types.d.ts';
+save(config.LIB + '/yyf.d.ts', tsd(typesfile));
+fs.unlink(typesfile);
+
