@@ -394,7 +394,7 @@
         * @method
         * @name yyfjs~yyf#error
         * @desc the [request level] callback handler when error occurs
-        * @param {yyfjs~dataHandler} callback - the callback function
+        * @param {yyfjs~errorHandler} callback - the callback function
         * @return {yyfjs~yyf}
         */
         /**
@@ -528,7 +528,7 @@
     YYF.setHandle = function (key, callback) {
         if (callback) { // key value
             CONFIG._handle[key] = callback;
-        } else if (typeof key == 'function' || typeof key == 'object') {
+        } else if (typeof key == 'object') {
             YYF({ handle: key });
         } else {
             if (DEBUG) {
@@ -544,7 +544,7 @@
      * so you can use as `obj.YYF` or `(new obj()).$yyf`
      * @method yyfjs.YYF.install
      * @param {any} obj - the object such as Vue or Jquery 
-     * @param {?string|yyfjs~Options|yyfjs~Config} [options] - options
+     * @param {string|yyfjs~Options|yyfjs~Config} [options] - options
      * @return {yyfjs.YYF}
      */
     YYF.install = function (obj, options) {
