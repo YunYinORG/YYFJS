@@ -39,6 +39,7 @@ after_success:
     fi;
   - git add . && git commit -m "[skip ci] auto build $(date -I)"
   - git push origin HEAD:${GH_BRANCH} -q
+  - cd "$TRAVIS_BUILD_DIR"
 
 
 # 自动发布
