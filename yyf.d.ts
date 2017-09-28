@@ -62,7 +62,7 @@ declare namespace yyfjs {
      * @param {?XMLHttpRequest} [request] - this xhr request object
      * @return {boolean|void} - return false to stop next handler event
      */
-    type dataHandler = (data?: any, request?: XMLHttpRequest)=>boolean | void;
+    type dataHandler = (data?: any, request?: XMLHttpRequest) => boolean | void;
 
     /**
      * ready (when respone arrives) or final(the last envent) Handler
@@ -71,7 +71,7 @@ declare namespace yyfjs {
      * @param {?XMLHttpRequest} [request] - this xhr request object
      * @return {boolean|void} - return false to stop next handler event
      */
-    type responseHandler = (response?: string | Response, request?: XMLHttpRequest)=>boolean | void;
+    type responseHandler = (response?: string | Response, request?: XMLHttpRequest) => boolean | void;
 
     /**
      * @callback yyfjs~beforeHandler
@@ -83,7 +83,7 @@ declare namespace yyfjs {
      * @param {XMLHttpRequest} [request] - this xhr request object
      * @return {any?} - the data undifined means keep before
      */
-    type beforeHandler = (data: any, headers?: any, url?: string, method?: string, request?: XMLHttpRequest)=>any;
+    type beforeHandler = (data: any, headers?: any, url?: string, method?: string, request?: XMLHttpRequest) => any;
 
     /**
      * @callback yyfjs~errorHandler
@@ -91,7 +91,7 @@ declare namespace yyfjs {
      * @param {XMLHttpRequest} [request] - this xhr request object
      * @param {?string|yyfjs~Response} [response] - response string or object
      */
-    type errorHandler = (request?: XMLHttpRequest, response?: string | Response)=>void;
+    type errorHandler = (request?: XMLHttpRequest, response?: string | Response) => void;
 
     /**
      * @typedef {yyfjs~dataHandler|yyfjs~responseHandler|yyfjs~beforeHandler|yyfjs~errorHandler} yyfjs~Handler
@@ -164,13 +164,17 @@ declare namespace yyfjs {
     class yyf {
         /**
          * set handle for different status
-         * @method yyfjs~yyf#on
-         * @param {string} key - status key
+         * @method yyfjs~yyf#setHandle
+         * @param {string|responseHandler} key - status key
          * @param {yyfjs~Handler?} [callback] - callback on this status
          * @return {yyfjs~yyf} - its self
          */
-        on(key: string, callback?: Handler): yyf;
-
+        setHandle(key: string, callback?: Handler): yyf;
+        /**
+         * replace the default behavior 
+         * @param handle replace the default behavior 
+         */
+        setHandle(handle: responseHandler): yyf;
         /**
          * @method
          * @desc get all the [request level] handlers map for all status
@@ -181,6 +185,14 @@ declare namespace yyfjs {
         getHandle(): {
             [key: string]: Handler;
         };
+
+        /**
+         * @method yyfjs~yyf#getHandle
+         * @desc get the handler of status for current request
+         * @param {string} status - status key,empty to get all handlers for current request
+         * @return {yyfjs~Handler} the handler of the status
+         */
+        getHandle(status: string): Handler;
 
         /**
          * send request
@@ -280,7 +292,7 @@ declare namespace yyfjs {
          * @param {yyfjs~errorHandler} callback - the callback function
          * @return {yyfjs~yyf}
          */
-        error(callback: errorHandler): yyf;
+        onerror(callback: errorHandler): yyf;
 
         /**
          * @method
@@ -319,18 +331,13 @@ declare namespace yyfjs {
      */
     interface YYF {
         /**
-         * @method yyfjs.YYF.config
+         * @method yyfjs.YYF
          * @desc config the options and create yyf request instance
          * @param {string|yyfjs~Options|yyfjs~Config} options - setting config, string => root
          * @param {Object.<string, yyfjs~Handler>} [handlersMap] - handlers
          * @param {Object.<string, number>} [codeMap] - code key map
          * @return {yyfjs.YYF}
          */
-        config(options: string | Options | Config, handlersMap?: {
-            [key: string]: Handler;
-        }, codeMap?: {
-            [key: string]: number;
-        }): YYF;
         (options: string | Options | Config, handlersMap?: {
             [key: string]: Handler;
         }, codeMap?: {
@@ -356,22 +363,18 @@ declare namespace yyfjs {
             [key: string]: Handler;
         };
         /**
-         * @method
-         * @name yyfjs.YYF.setHandle
-         * @variation 1
-         * @desc set global handle map
-         * @param {Object.<string, yyfjs~Handler>} handlerMap
-         * @return {yyfjs.YYF} - its self
+         * @method yyfjs.YYF.getHandle
+         * @desc get the global handler of status
+         * @param {string} status - status key
+         * @return {yyfjs~Handler} - the global handler of the status
          */
-        setHandle(handlerMap: {
-            [key: string]: Handler;
-        }): YYF;
+        getHandle(status: string): Handler;
         /**
          * register YYF to an object prototype
          * so you can use as `obj.YYF` or `(new obj()).$yyf`
          * @method yyfjs.YYF.install
          * @param {any} obj - the object such as Vue or Jquery
-         * @param {string|yyfjs~Options|yyfjs~Config} [options] - options
+         * @param {?string|yyfjs~Options|yyfjs~Config} [options] - options
          * @return {yyfjs.YYF}
          */
         install(obj: any, options?: string | Options | Config): YYF;
@@ -433,14 +436,7 @@ declare namespace yyfjs {
          * @return {yyfjs~yyf} -its self
          */
         delete(url: string, async?: boolean): yyf;
-        /**
-         * set handle for different status
-         * @method yyfjs~yyf#on
-         * @param {string} key - status key
-         * @param {yyfjs~Handler?} [callback] - callback on this status
-         * @return {yyfjs~yyf} - its self
-         */
-        on(key: string, callback?: Handler): yyf;
+
         /**
          * @name yyfjs~yyf#success
          * @method
@@ -480,7 +476,7 @@ declare namespace yyfjs {
          * @param {yyfjs~errorHandler} callback - the callback function
          * @return {yyfjs~yyf}
          */
-        error(callback: errorHandler): yyf;
+        onerror(callback: errorHandler): yyf;
     }
 
 }
