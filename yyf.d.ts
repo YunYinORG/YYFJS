@@ -277,10 +277,10 @@ declare namespace yyfjs {
          * @method
          * @name yyfjs~yyf#error
          * @desc the [request level] callback handler when error occurs
-         * @param {yyfjs~dataHandler} callback - the callback function
+         * @param {yyfjs~errorHandler} callback - the callback function
          * @return {yyfjs~yyf}
          */
-        error(callback: dataHandler): yyf;
+        error(callback: errorHandler): yyf;
 
         /**
          * @method
@@ -326,14 +326,14 @@ declare namespace yyfjs {
          * @param {Object.<string, number>} [codeMap] - code key map
          * @return {yyfjs.YYF}
          */
-        config(options: string | Options | Config, handlersMap: {
+        config(options: string | Options | Config, handlersMap?: {
             [key: string]: Handler;
-        }, codeMap: {
+        }, codeMap?: {
             [key: string]: number;
         }): YYF;
-        (options: string | Options | Config, handlersMap: {
+        (options: string | Options | Config, handlersMap?: {
             [key: string]: Handler;
-        }, codeMap: {
+        }, codeMap?: {
             [key: string]: number;
         }): YYF;
         /**
@@ -371,10 +371,10 @@ declare namespace yyfjs {
          * so you can use as `obj.YYF` or `(new obj()).$yyf`
          * @method yyfjs.YYF.install
          * @param {any} obj - the object such as Vue or Jquery
-         * @param {?string|yyfjs~Options|yyfjs~Config} [options] - options
+         * @param {string|yyfjs~Options|yyfjs~Config} [options] - options
          * @return {yyfjs.YYF}
          */
-        install(obj: any, options: string | Options | Config): YYF;
+        install(obj: any, options?: string | Options | Config): YYF;
         /**
          * send request
          * @method yyfjs~yyf#request
@@ -384,7 +384,7 @@ declare namespace yyfjs {
          * @param {boolean} [async] - request async or sync default using CONFIG (default false)
          * @return {yyfjs~yyf} -its self
          */
-        request(method: string, url: string, data: any, async: boolean): yyf;
+        request(method: string, url: string, data?: any, async?: boolean): yyf;
         /**
          * @name yyfjs~yyf#get
          * @desc send the GET request
@@ -394,7 +394,7 @@ declare namespace yyfjs {
          * @param {boolean} [async] - request async or sync default using CONFIG (default false)
          * @return {yyfjs~yyf} -its self
          */
-        get(url: string, data: any, async: boolean): yyf;
+        get(url: string, data?: any, async?: boolean): yyf;
         /**
          * @name yyfjs~yyf#post
          * @desc send the POST request
@@ -404,7 +404,7 @@ declare namespace yyfjs {
          * @param {boolean} [async] - request async or sync default using CONFIG (default false)
          * @return {yyfjs~yyf} -its self
          */
-        post(url: string, data: any, async: boolean): yyf;
+        post(url: string, data?: any, async?: boolean): yyf;
         /**
          * @name yyfjs~yyf#put
          * @desc send the PUT request
@@ -414,7 +414,7 @@ declare namespace yyfjs {
          * @param {boolean} [async] - request async or sync default using CONFIG (default false)
          * @return {yyfjs~yyf} -its self
          */
-        put(url: string, data: any, async: boolean): yyf;
+        put(url: string, data?: any, async?: boolean): yyf;
         /**
          * @name yyfjs~yyf#patch
          * @desc send the PATCH request
@@ -424,7 +424,7 @@ declare namespace yyfjs {
          * @param {boolean} [async] - request async or sync default using CONFIG (default false)
          * @return {yyfjs~yyf} -its self
          */
-        patch(url: string, data: any, async: boolean): yyf;
+        patch(url: string, data?: any, async?: boolean): yyf;
         /**
          * quick delete
          * @method yyfjs~yyf#delete
@@ -432,7 +432,7 @@ declare namespace yyfjs {
          * @param {boolean} [async] - request async or sync default using Options (@see yyfjs~Options)
          * @return {yyfjs~yyf} -its self
          */
-        delete(url: string, async: boolean): yyf;
+        delete(url: string, async?: boolean): yyf;
         /**
          * set handle for different status
          * @method yyfjs~yyf#on
@@ -440,7 +440,7 @@ declare namespace yyfjs {
          * @param {yyfjs~Handler?} [callback] - callback on this status
          * @return {yyfjs~yyf} - its self
          */
-        on(key: string, callback: Handler): yyf;
+        on(key: string, callback?: Handler): yyf;
         /**
          * @name yyfjs~yyf#success
          * @method
@@ -477,10 +477,10 @@ declare namespace yyfjs {
          * @method
          * @name yyfjs~yyf#error
          * @desc the [request level] callback handler when error occurs
-         * @param {yyfjs~dataHandler} callback - the callback function
+         * @param {yyfjs~errorHandler} callback - the callback function
          * @return {yyfjs~yyf}
          */
-        error(callback: dataHandler): yyf;
+        error(callback: errorHandler): yyf;
     }
 
 }

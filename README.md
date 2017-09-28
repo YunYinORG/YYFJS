@@ -1,13 +1,19 @@
-# YYFJS
+# YYFJS@BETA
 
 [YYF](https://github.com/YunYinORG/YYF)前端请求和数据接口封装JS库。
 
 The frontend JavaScript library for [YYF](https://github.com/YunYinORG/YYF) RESTful API request.
 
+2.x为Beta版，安装方式
+``` 
+npm i yyfjs@beta -S 
+```
+
 [![Build Status](https://travis-ci.org/YunYinORG/YYFJS.svg?branch=master)](https://travis-ci.org/YunYinORG/YYFJS)
 [![npm](https://img.shields.io/npm/v/yyfjs.svg)](https://www.npmjs.com/package/yyfjs)
 [![lib size](http://img.badgesize.io/YunYinORG/YYFJS/gh-pages/yyf.js?color=green)](https://github.com/YunYinORG/YYFJS/tree/gh-pages)
 [![lib gzip size](http://img.badgesize.io/https://unpkg.com/yyfjs?compression=gzip&label=gzip)](https://unpkg.com/yyfjs)
+
 
 1. [安装和使用](#install)
 2. [接口API](#interface)
