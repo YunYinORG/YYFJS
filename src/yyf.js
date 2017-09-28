@@ -557,7 +557,7 @@
     if (typeof window != 'undefined' && window.Vue) { //Vue auto install
         window.Vue.use(YYF);
     } else if (typeof module != 'undefined' && typeof exports == 'object') { //require
-        exports = YYF;
+        module.exports = YYF;
     } else if (typeof define == 'function' && define.amd) { //amd
         define(function () { return YYF; });
     } else { //window
